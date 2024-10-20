@@ -14,13 +14,15 @@ import static org.reminder.edu.configuration.DefaultConfiguration.STOP_BITS;
 import static org.reminder.edu.configuration.DefaultConfiguration.THERMAL_SENSOR_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.VOLUME_CHANGE_SENSOR_COUNT;
 
+import com.fazecast.jSerialComm.SerialPort;
+
 public class ApplicationConfiguration {
 
     private static final int MEASURING_DEVICE_COUNT = 15;
     private static ApplicationConfiguration instance;
 
     private int slaveAdress = SLAVE_ADRESS;
-    private String parity = PARITY;
+    private int parity = SerialPort.NO_PARITY;
     private int baudRate = BAUD_RATE;
     private int dataBits = DATA_BITS;
     private String stopBits = STOP_BITS;
@@ -104,11 +106,11 @@ public class ApplicationConfiguration {
         this.slaveAdress = slaveAdress;
     }
 
-    public String getParity() {
+    public int getParity() {
         return parity;
     }
 
-    public void setParity(String parity) {
+    public void setParity(int parity) {
         this.parity = parity;
     }
 

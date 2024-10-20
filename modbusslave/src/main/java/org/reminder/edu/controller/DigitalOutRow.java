@@ -32,10 +32,10 @@ public class DigitalOutRow {
 
     private enum Target {
 
-        ONN_OFF("Включить/Выключить"), NORMAL_STATE(
-                "Установить нормальное состояние"), GENERATE_ALARM(
-                        "Сгенерировать треовгу"), GENERATE_DEFECT(
-                                "Сгенерировать неисправность");
+        ONN_OFF("Включить/Выключить"),
+        NORMAL_STATE("Установить нормальное состояние"), 
+        GENERATE_ALARM("Сгенерировать треовгу"),
+        GENERATE_DEFECT("Сгенерировать неисправность");
 
         private String targetValue;
 

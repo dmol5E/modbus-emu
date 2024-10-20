@@ -8,6 +8,8 @@ import org.reminder.edu.modbusslave.ApplicationManager;
 import org.reminder.edu.modbusslave.MessageRenderer;
 import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
 
+import com.fazecast.jSerialComm.SerialPort;
+
 import gnu.io.CommPortIdentifier;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -84,11 +86,9 @@ public class SlaveController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         final ObservableList<String> portNamesItems = portNames.getItems();
-        Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
-        while (portList.hasMoreElements()) {
-            CommPortIdentifier portId = (CommPortIdentifier) portList
-                    .nextElement();
-            portNamesItems.add(portId.getName());
+        SerialPort[] ports = SerialPort.getCommPorts();
+        for(SerialPort serialPort: ports) {
+                portNamesItems.add(serialPort.getSystemPortName());
         }
 
         final ObservableList<Integer> dataBitsItems = dataBits.getItems();
@@ -106,12 +106,6 @@ public class SlaveController implements Initializable {
         baudRateItems.add(9600);
         baudRateItems.add(14400);
         baudRate.getSelectionModel().select(3);
-
-        final ObservableList<String> parityItems = parity.getItems();
-        parityItems.add("None");
-        parityItems.add("Even");
-        parityItems.add("Odd");
-        parity.getSelectionModel().select(0);
 
         final ObservableList<String> stopBitsItems = stopBits.getItems();
         stopBitsItems.add("1");
@@ -171,5 +165,8 @@ public class SlaveController implements Initializable {
         registersTable.getItems().addAll(model.getSensors());
         digOutsTable.getItems().addAll(
                 DigitalOutRow.generateDigitalOutRow(model.getMappers()));
+                final ObservableList<String> parityItems = parity.getItems();
+        parityItems.addAll(model.getParityValues());
+        parity.getSelectionModel().select(0);
     }
 }

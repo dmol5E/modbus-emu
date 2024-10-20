@@ -1,11 +1,22 @@
 package org.reminder.edu.modbusslave;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.reminder.edu.configuration.ApplicationConfiguration;
 import org.reminder.edu.modbusslave.comm.CoilSensorMapper;
 import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
+
+import com.digitalpetri.modbus.server.ModbusRtuServer;
+import com.digitalpetri.modbus.server.ProcessImage;
+import com.digitalpetri.modbus.server.ReadWriteModbusServices;
+import com.digitalpetri.modbus.server.SerialPortServerTransport;
+import com.fazecast.jSerialComm.SerialPort;
 
 import net.wimpi.modbus.Modbus;
 import net.wimpi.modbus.ModbusCoupler;
@@ -29,12 +40,14 @@ public class ApplicationManager {
     private String portName;
     private int baudRate;
     private int dataBits;
-    private String parity;
+    private int parity;
     private String stopBits;
     private String flowControl;
     private int slaveId;
     private Thread currentModBusListener;
     private MessageRenderer renderer;
+    private Map<String, Integer> parityMapping;
+    ModbusRtuServer server;
 
     public ApplicationManager() {
         sensors = Helper.createSensorsFromConfiguration();
@@ -57,6 +70,13 @@ public class ApplicationManager {
         this.portName = "COM1";
         this.baudRate = appConfig.getBaudRate();
         this.parity = appConfig.getParity();
+        Map<String, Integer> parityMapping = new HashMap<>();
+        parityMapping.put("None", SerialPort.NO_PARITY);
+        parityMapping.put("Odd", SerialPort.ODD_PARITY);
+        parityMapping.put("Even", SerialPort.EVEN_PARITY);
+        parityMapping.put("Mark", SerialPort.MARK_PARITY);
+        parityMapping.put("Space", SerialPort.SPACE_PARITY);
+        this.parityMapping = parityMapping;
         this.stopBits = appConfig.getStopBits();
         this.flowControl = "None";
         this.slaveId = appConfig.getSlaveUuid();
@@ -78,28 +98,40 @@ public class ApplicationManager {
     }
 
     public void startModbusListener() {
-        SimpleProcessImage spi = buildSimpleProcessImage();
+        ProcessImage processImage = new ProcessImage();
+        ReadWriteModbusServices modbusServices = new ReadWriteModbusServices() {
 
-        ModbusCoupler.getReference().setProcessImage(spi);
-        ModbusCoupler.getReference().setMaster(false);
-        ModbusCoupler.getReference().setUnitID(slaveId);
-        final SerialParameters params = new SerialParameters();
-        params.setPortName(portName);
-        params.setBaudRate(baudRate);
-        params.setDatabits(dataBits);
-        params.setParity(parity);
-        params.setStopbits(stopBits);
-        params.setFlowControlIn(flowControl);
-        params.setEncoding("ascii");
-        params.setEcho(false);
+            @Override
+            protected Optional<ProcessImage> getProcessImage(int unitId) {
+                return Optional.of(processImage);
+            }
+            
+        };
 
-        currentModBusListener = new ModBusListener(params, renderer);
-        currentModBusListener.start();
+        server = ModbusRtuServer.create(
+          SerialPortServerTransport.create(
+            cfg -> {
+                cfg.serialPort = portName;
+                cfg.baudRate = baudRate;
+                cfg.parity = parity;
+                cfg.stopBits = Integer.parseInt(stopBits);
+            }
+          ),
+          modbusServices);
+        try {
+            server.start();
+            this.renderer.info("Listening " + this.portName);
+        } catch (ExecutionException | InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void stopModbusListener() {
-        if (currentModBusListener != null) {
-            currentModBusListener.interrupt();
+        try {
+            server.stop();
+            this.renderer.info("Listening has been stopped.");
+        } catch (ExecutionException | InterruptedException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -116,7 +148,7 @@ public class ApplicationManager {
     }
 
     public void setParity(String parity) {
-        this.parity = parity;
+        this.parity = this.parityMapping.get(parity);
     }
 
     public void setStopBits(String stopBits) {
@@ -141,6 +173,10 @@ public class ApplicationManager {
 
     public List<CoilSensorMapper> getMappers() {
         return mappers;
+    }
+
+    public Set<String> getParityValues() {
+        return this.parityMapping.keySet();
     }
 
     private static class ModBusListener extends Thread {
