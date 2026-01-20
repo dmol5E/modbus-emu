@@ -7,8 +7,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
+import org.reminder.edu.MessagePrinter;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
-import org.reminder.edu.modbusslave.MessageRenderer;
 import org.reminder.edu.model.MasterModel;
 
 import gnu.io.CommPortIdentifier;
@@ -99,7 +99,7 @@ public class MasterController implements Initializable {
     @FXML
     private TextArea logArea;
     
-    private MessageRenderer messageRenderer;
+    private MessagePrinter messageRenderer;
     
     private MasterModel model;
     

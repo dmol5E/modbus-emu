@@ -16,8 +16,7 @@ public class DataRegisterSensor extends SensorImpl implements Sensor {
     private IntegerProperty registerValue;
     private StringProperty comment;
 
-    public DataRegisterSensor(String name, String alarmMessage,
-            String shortName, Register register) {
+    public DataRegisterSensor(String name, String alarmMessage,String shortName, Register register) {
         super(name, alarmMessage, shortName);
         this.register = register;
         onSensor();

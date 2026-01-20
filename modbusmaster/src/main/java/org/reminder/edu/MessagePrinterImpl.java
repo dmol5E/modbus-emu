@@ -1,14 +1,12 @@
-package org.reminder.edu.controller;
-
-import org.reminder.edu.modbusslave.MessageRenderer;
+package org.reminder.edu;
 
 import javafx.scene.control.TextArea;
 
-public class TextAreaAdapter implements MessageRenderer {
+public class MessagePrinterImpl implements MessagePrinter {
 
     private TextArea textArea;
 
-    public TextAreaAdapter(TextArea textArea) {
+    public MessagePrinterImpl(TextArea textArea) {
         this.textArea = textArea;
     }
 

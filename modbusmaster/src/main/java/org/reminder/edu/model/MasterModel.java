@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.reminder.edu.MessagePrinter;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
 import org.reminder.edu.modbusslave.Helper;
-import org.reminder.edu.modbusslave.MessageRenderer;
 import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
 import org.reminder.edu.modbusslave.entity.Sensor;
 
@@ -27,7 +27,7 @@ public class MasterModel {
     private String stopBits;
     
     private Collection<SensorProxy> sensors;
-    private MessageRenderer messageRenderer;
+    private MessagePrinter messageRenderer;
     
     public MasterModel() {
         List<DataRegisterSensor> originSensors = Helper.createSensorsFromConfiguration();
@@ -130,11 +130,11 @@ public class MasterModel {
         this.stopBits = stopBits;
     }
 
-    public MessageRenderer getMessageRenderer() {
+    public MessagePrinter getMessageRenderer() {
         return messageRenderer;
     }
 
-    public void setMessageRenderer(MessageRenderer messageRenderer) {
+    public void setMessageRenderer(MessagePrinter messageRenderer) {
         this.messageRenderer = messageRenderer;
     }
 }

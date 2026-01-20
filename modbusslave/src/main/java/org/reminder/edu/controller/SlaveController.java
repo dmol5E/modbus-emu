@@ -1,16 +1,17 @@
 package org.reminder.edu.controller;
 
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.ResourceBundle;
 
-import org.reminder.edu.modbusslave.ApplicationManager;
-import org.reminder.edu.modbusslave.MessageRenderer;
+import org.reminder.edu.modbusslave.ModBusSecondary;
 import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
+import org.reminder.edu.modbusslave.logging.LogAppenderManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.google.inject.Inject;
 
-import gnu.io.CommPortIdentifier;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,6 +23,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 
 public class SlaveController implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(SlaveController.class);
 
     @FXML
     private ComboBox<String> portNames;
@@ -77,19 +80,28 @@ public class SlaveController implements Initializable {
     @FXML
     private TextArea logArea;
 
-    private ApplicationManager model;
-    private MessageRenderer messageRenderer;
+    private final ModBusSecondary model;
 
-    public SlaveController() {
+    @Inject
+    public SlaveController(ModBusSecondary manager) {
+        this.model = manager;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        registersTable.getItems().addAll(model.getSensors());
+        digOutsTable.getItems().addAll(
+                DigitalOutRow.generateDigitalOutRow(model.getMappers()));
+        final ObservableList<String> parityItems = parity.getItems();
+        parityItems.addAll(model.getParityValues());
+        parity.getSelectionModel().select(0);
+
         final ObservableList<String> portNamesItems = portNames.getItems();
         SerialPort[] ports = SerialPort.getCommPorts();
-        for(SerialPort serialPort: ports) {
-                portNamesItems.add(serialPort.getSystemPortName());
+        for (SerialPort serialPort : ports) {
+            portNamesItems.add(serialPort.getSystemPortName());
         }
+        portNames.setValue(portNames.getItems().get(0));
 
         final ObservableList<Integer> dataBitsItems = dataBits.getItems();
         dataBitsItems.add(4);
@@ -121,7 +133,8 @@ public class SlaveController implements Initializable {
         // flowControlItems.add("rts/cts out");
         flowControl.getSelectionModel().select(0);
 
-        this.messageRenderer = new TextAreaAdapter(logArea);
+        // Register the TextArea with the logging system to display log messages
+        LogAppenderManager.registerTextArea(logArea);
 
         registerNumberCol.setCellValueFactory(
                 cellData -> cellData.getValue().getRegisterNumber().asObject());
@@ -143,6 +156,7 @@ public class SlaveController implements Initializable {
     @FXML
     private void handleOpenConnection(ActionEvent event) {
         this.logArea.clear();
+        logger.info("Opening Modbus connection");
 
         model.setPortName(portNames.getValue());
         model.setBaudRate(baudRate.getValue());
@@ -152,21 +166,17 @@ public class SlaveController implements Initializable {
         model.setFlowControl(flowControl.getValue());
 
         model.startModbusListener();
+        logger.info("Modbus connection opened on port: {}", portNames.getValue());
     }
 
     @FXML
     private void handleCloseConnection(ActionEvent event) {
+        logger.info("Closing Modbus connection");
         model.stopModbusListener();
+        logger.info("Modbus connection closed");
     }
 
-    public void setApplicationManager(ApplicationManager model) {
-        this.model = model;
-        model.setRenderer(messageRenderer);
-        registersTable.getItems().addAll(model.getSensors());
-        digOutsTable.getItems().addAll(
-                DigitalOutRow.generateDigitalOutRow(model.getMappers()));
-                final ObservableList<String> parityItems = parity.getItems();
-        parityItems.addAll(model.getParityValues());
-        parity.getSelectionModel().select(0);
+    public void cleanup() {
+        LogAppenderManager.unregisterTextArea();
     }
 }

@@ -11,31 +11,29 @@ import java.util.concurrent.ExecutionException;
 import org.reminder.edu.configuration.ApplicationConfiguration;
 import org.reminder.edu.modbusslave.comm.CoilSensorMapper;
 import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.digitalpetri.modbus.serial.server.SerialPortServerTransport;
 import com.digitalpetri.modbus.server.ModbusRtuServer;
 import com.digitalpetri.modbus.server.ProcessImage;
 import com.digitalpetri.modbus.server.ReadWriteModbusServices;
-import com.digitalpetri.modbus.server.SerialPortServerTransport;
 import com.fazecast.jSerialComm.SerialPort;
+import com.google.inject.Inject;
 
-import net.wimpi.modbus.Modbus;
-import net.wimpi.modbus.ModbusCoupler;
-import net.wimpi.modbus.io.ModbusTransport;
-import net.wimpi.modbus.msg.ModbusRequest;
-import net.wimpi.modbus.msg.ModbusResponse;
-import net.wimpi.modbus.net.SerialConnection;
 import net.wimpi.modbus.procimg.DigitalOut;
 import net.wimpi.modbus.procimg.ObservableDigitalOut;
 import net.wimpi.modbus.procimg.Register;
 import net.wimpi.modbus.procimg.SimpleProcessImage;
-import net.wimpi.modbus.util.SerialParameters;
 
-public class ApplicationManager {
+public final class ModBusSecondary {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ModBusSecondary.class);
 
     private List<DataRegisterSensor> sensors;
-    private List<DigitalOut> digOuts;
-    private List<Register> registers;
-    private List<CoilSensorMapper> mappers;
+    private final List<DigitalOut> digOuts = new ArrayList<>();
+    private final List<Register> registers = new ArrayList<>();
+    private final List<CoilSensorMapper> mappers = new ArrayList<>();
 
     private String portName;
     private int baudRate;
@@ -45,21 +43,17 @@ public class ApplicationManager {
     private String flowControl;
     private int slaveId;
     private Thread currentModBusListener;
-    private MessageRenderer renderer;
     private Map<String, Integer> parityMapping;
     ModbusRtuServer server;
 
-    public ApplicationManager() {
+    @Inject
+    public ModBusSecondary() {
         sensors = Helper.createSensorsFromConfiguration();
-        digOuts = new ArrayList<>();
-        registers = new ArrayList<>();
-        mappers = new ArrayList<>();
 
         for (DataRegisterSensor sensor : sensors) {
             registers.add(sensor.getRegister());
 
-            List<ObservableDigitalOut> digs = Helper
-                    .createFourObservableDigitalOut();
+            List<ObservableDigitalOut> digs = Helper.createFourObservableDigitalOut();
             mappers.add(new CoilSensorMapper(sensor, digs));
             digOuts.addAll(digs);
         }
@@ -80,7 +74,6 @@ public class ApplicationManager {
         this.stopBits = appConfig.getStopBits();
         this.flowControl = "None";
         this.slaveId = appConfig.getSlaveUuid();
-        this.renderer = new EmptyMessageRenderer();
     }
 
     protected SimpleProcessImage buildSimpleProcessImage() {
@@ -99,6 +92,7 @@ public class ApplicationManager {
 
     public void startModbusListener() {
         ProcessImage processImage = new ProcessImage();
+
         ReadWriteModbusServices modbusServices = new ReadWriteModbusServices() {
 
             @Override
@@ -120,18 +114,20 @@ public class ApplicationManager {
           modbusServices);
         try {
             server.start();
-            this.renderer.info("Listening " + this.portName);
+            logger.info("Modbus server started on port: {}", this.portName);
         } catch (ExecutionException | InterruptedException ex) {
-            ex.printStackTrace();
+            logger.error("Error starting Modbus server on port: {}", this.portName, ex);
         }
     }
 
     public void stopModbusListener() {
         try {
-            server.stop();
-            this.renderer.info("Listening has been stopped.");
+            if (server != null) {
+                server.stop();
+            }
+            logger.info("Modbus server stopped successfully");
         } catch (ExecutionException | InterruptedException ex) {
-            ex.printStackTrace();
+            logger.error("Error stopping Modbus server", ex);
         }
     }
 
@@ -163,10 +159,6 @@ public class ApplicationManager {
         this.slaveId = slaveId;
     }
 
-    public void setRenderer(MessageRenderer renderer) {
-        this.renderer = renderer;
-    }
-
     public List<DataRegisterSensor> getSensors() {
         return sensors;
     }
@@ -177,51 +169,5 @@ public class ApplicationManager {
 
     public Set<String> getParityValues() {
         return this.parityMapping.keySet();
-    }
-
-    private static class ModBusListener extends Thread {
-
-        private SerialConnection connection;
-        private MessageRenderer log;
-
-        public ModBusListener(SerialParameters params, MessageRenderer log) {
-            this.connection = new SerialConnection(params);
-            this.log = log;
-            this.setDaemon(true);
-        }
-
-        @Override
-        public void run() {
-
-            try {
-                connection.open();
-                ModbusTransport transport = connection.getModbusTransport();
-
-                while (!this.isInterrupted()) {
-                    ModbusRequest request = transport.readRequest();
-                    ModbusResponse response = null;
-
-                    if (ModbusCoupler.getReference()
-                            .getProcessImage() == null) {
-                        response = request.createExceptionResponse(
-                                Modbus.ILLEGAL_FUNCTION_EXCEPTION);
-                    } else {
-                        response = request.createResponse();
-                    }
-
-                    log.info("Request: (" + request.getFunctionCode() + ") "
-                            + request.getHexMessage().toUpperCase());
-                    log.info("Response: (" + response.getFunctionCode() + ") "
-                            + response.getHexMessage().toUpperCase());
-
-                    transport.writeMessage(response);
-                }
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                connection.close();
-            }
-        }
     }
 }
