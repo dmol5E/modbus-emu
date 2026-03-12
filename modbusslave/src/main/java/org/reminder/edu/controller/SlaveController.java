@@ -4,7 +4,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import org.reminder.edu.modbusslave.ModBusSecondary;
-import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
+import org.reminder.edu.modbusslave.entity.Sensor;
+import org.reminder.edu.modbusslave.entity.enums.SensorState;
+import org.reminder.edu.modbusslave.entity.enums.SensorType;
 import org.reminder.edu.modbusslave.logging.LogAppenderManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +19,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 
 public class SlaveController implements Initializable {
 
@@ -42,40 +49,37 @@ public class SlaveController implements Initializable {
     private ComboBox<String> stopBits;
 
     @FXML
-    private ComboBox<String> flowControl;
-
-    @FXML
     private Button btnOpen;
 
     @FXML
     private Button btnClose;
 
     @FXML
-    private TableView<DataRegisterSensor> registersTable;
+    private TableView<Sensor> sensorsTable;
 
     @FXML
-    private TableColumn<DataRegisterSensor, Integer> registerNumberCol;
+    private TableColumn<Sensor, Integer> sensorIdCol;
 
     @FXML
-    private TableColumn<DataRegisterSensor, Integer> registerValueCol;
+    private TableColumn<Sensor, SensorType> sensorTypeCol;
 
     @FXML
-    private TableColumn<DataRegisterSensor, String> commentCol;
+    private TableColumn<Sensor, String> sensorNameCol;
 
     @FXML
-    private TableView<DigitalOutRow> digOutsTable;
+    private TableColumn<Sensor, Integer> sensorAddressCol;
 
     @FXML
-    private TableColumn<DigitalOutRow, Integer> digOutAdressCol;
+    private TableColumn<Sensor, Boolean> sensorEnabledCol;
 
     @FXML
-    private TableColumn<DigitalOutRow, Integer> digOutValueCol;
+    private TableColumn<Sensor, SensorState> sensorStateCol;
 
     @FXML
-    private TableColumn<DigitalOutRow, String> digOutTargetCol;
+    private TableColumn<Sensor, String> sensorValueCol;
 
     @FXML
-    private TableColumn<DigitalOutRow, String> digOutCommentCol;
+    private TableColumn<Sensor, Void> sensorActionsCol;
 
     @FXML
     private TextArea logArea;
@@ -89,9 +93,8 @@ public class SlaveController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        registersTable.getItems().addAll(model.getSensors());
-        digOutsTable.getItems().addAll(
-                DigitalOutRow.generateDigitalOutRow(model.getMappers()));
+        sensorsTable.getItems().addAll(model.getSensors());
+
         final ObservableList<String> parityItems = parity.getItems();
         parityItems.addAll(model.getParityValues());
         parity.getSelectionModel().select(0);
@@ -101,7 +104,9 @@ public class SlaveController implements Initializable {
         for (SerialPort serialPort : ports) {
             portNamesItems.add(serialPort.getSystemPortName());
         }
-        portNames.setValue(portNames.getItems().get(0));
+        if (!portNamesItems.isEmpty()) {
+            portNames.setValue(portNamesItems.get(0));
+        }
 
         final ObservableList<Integer> dataBitsItems = dataBits.getItems();
         dataBitsItems.add(4);
@@ -125,32 +130,85 @@ public class SlaveController implements Initializable {
         stopBitsItems.add("2");
         stopBits.getSelectionModel().select(0);
 
-        final ObservableList<String> flowControlItems = flowControl.getItems();
-        flowControlItems.add("None");
-        // flowControlItems.add("xon/xoff out");
-        flowControlItems.add("xon/xoff in");
-        flowControlItems.add("rts/cts in");
-        // flowControlItems.add("rts/cts out");
-        flowControl.getSelectionModel().select(0);
-
-        // Register the TextArea with the logging system to display log messages
         LogAppenderManager.registerTextArea(logArea);
 
-        registerNumberCol.setCellValueFactory(
-                cellData -> cellData.getValue().getRegisterNumber().asObject());
-        registerValueCol.setCellValueFactory(
-                cellData -> cellData.getValue().getRegisterValue().asObject());
-        commentCol.setCellValueFactory(
-                cellData -> cellData.getValue().getComment());
+        setupSensorTableColumns();
+    }
 
-        digOutAdressCol.setCellValueFactory(
-                cellData -> cellData.getValue().getDigOutAdress().asObject());
-        digOutCommentCol.setCellValueFactory(
-                cellData -> cellData.getValue().getDigOutComment());
-        digOutTargetCol.setCellValueFactory(
-                cellData -> cellData.getValue().getDigOutTarget());
-        digOutValueCol.setCellValueFactory(
-                cellData -> cellData.getValue().getDigOutValue().asObject());
+    private void setupSensorTableColumns() {
+        sensorIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        sensorTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        sensorNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        sensorAddressCol.setCellValueFactory(new PropertyValueFactory<>("modbusAddress"));
+
+        sensorEnabledCol.setCellValueFactory(new PropertyValueFactory<>("enabled"));
+        sensorEnabledCol.setCellFactory(column -> new TableCell<Sensor, Boolean>() {
+            private final CheckBox checkBox = new CheckBox();
+
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    checkBox.setSelected(item);
+                    checkBox.setOnAction(e -> {
+                        Sensor sensor = getTableView().getItems().get(getIndex());
+                        sensor.setEnabled(checkBox.isSelected());
+                        logger.info("Sensor {} enabled: {}", sensor.getName(), checkBox.isSelected());
+                    });
+                    setGraphic(checkBox);
+                }
+            }
+        });
+
+        sensorStateCol.setCellValueFactory(new PropertyValueFactory<>("state"));
+
+        sensorValueCol.setCellValueFactory(new PropertyValueFactory<>("valueDisplay"));
+
+        sensorActionsCol.setCellFactory(createActionButtonCellFactory());
+    }
+
+    private Callback<TableColumn<Sensor, Void>, TableCell<Sensor, Void>> createActionButtonCellFactory() {
+        return new Callback<TableColumn<Sensor, Void>, TableCell<Sensor, Void>>() {
+            @Override
+            public TableCell<Sensor, Void> call(TableColumn<Sensor, Void> param) {
+                return new TableCell<Sensor, Void>() {
+                    private final Button resetBtn = new Button("Сброс");
+                    private final Button alarmBtn = new Button("Тревога");
+                    private final Button faultBtn = new Button("Сбой");
+                    private final HBox buttons = new HBox(5, resetBtn, alarmBtn, faultBtn);
+
+                    {
+                        resetBtn.setOnAction(e -> {
+                            Sensor sensor = getTableView().getItems().get(getIndex());
+                            sensor.resetToDefault();
+                            logger.info("Sensor {} reset to default", sensor.getName());
+                        });
+                        alarmBtn.setOnAction(e -> {
+                            Sensor sensor = getTableView().getItems().get(getIndex());
+                            sensor.setState(SensorState.ALARM);
+                            logger.info("Sensor {} set to ALARM", sensor.getName());
+                        });
+                        faultBtn.setOnAction(e -> {
+                            Sensor sensor = getTableView().getItems().get(getIndex());
+                            sensor.setState(SensorState.FAULT);
+                            logger.info("Sensor {} set to FAULT", sensor.getName());
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(buttons);
+                        }
+                    }
+                };
+            }
+        };
     }
 
     @FXML
@@ -163,7 +221,6 @@ public class SlaveController implements Initializable {
         model.setDataBits(dataBits.getValue());
         model.setParity(parity.getValue());
         model.setStopBits(stopBits.getValue());
-        model.setFlowControl(flowControl.getValue());
 
         model.startModbusListener();
         logger.info("Modbus connection opened on port: {}", portNames.getValue());

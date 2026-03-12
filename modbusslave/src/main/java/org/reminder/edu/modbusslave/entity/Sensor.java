@@ -1,29 +1,50 @@
 package org.reminder.edu.modbusslave.entity;
 
-public interface Sensor {
+import org.reminder.edu.modbusslave.entity.enums.SensorState;
+import org.reminder.edu.modbusslave.entity.enums.SensorType;
 
-    String getName();
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.StringProperty;
+
+public interface Sensor {
 
     int getId();
 
+    SensorType getType();
+
+    String getName();
+
     String getShortName();
 
-    String getState();
+    boolean isEnabled();
 
-    int getStateCode();
+    void setEnabled(boolean enabled);
 
-    void setState(int codeState);
+    SensorState getState();
 
-    boolean isOn();
+    void setState(SensorState state);
 
-    void onSensor();
+    ReadOnlyObjectProperty<SensorState> stateProperty();
 
-    void offSensor();
+    StringProperty nameProperty();
 
-    void setDefectStatus();
+    StringProperty shortNameProperty();
 
-    void setNormalStatus();
+    void resetToDefault();
 
-    void setAlarmStatus();
+    void turnOn();
 
+    void turnOff();
+
+    Object getValue();
+
+    void setValue(Object value);
+
+    ReadOnlyStringProperty valueDisplayProperty();
+
+    int getModbusAddress();
+
+    void setModbusAddress(int address);
 }

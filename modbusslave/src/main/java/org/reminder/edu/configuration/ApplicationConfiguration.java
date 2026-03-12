@@ -7,12 +7,12 @@ import static org.reminder.edu.configuration.DefaultConfiguration.DATA_BITS;
 import static org.reminder.edu.configuration.DefaultConfiguration.FIRE_BUTTON_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.GLASS_BREAK_SENSOR_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.PARITY;
+import static org.reminder.edu.configuration.DefaultConfiguration.PRESSURE_SENSOR_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.SLAVE_ADRESS;
 import static org.reminder.edu.configuration.DefaultConfiguration.SLAVE_UUID;
 import static org.reminder.edu.configuration.DefaultConfiguration.SMOKE_SENSOR_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.STOP_BITS;
 import static org.reminder.edu.configuration.DefaultConfiguration.THERMAL_SENSOR_COUNT;
-import static org.reminder.edu.configuration.DefaultConfiguration.VOLUME_CHANGE_SENSOR_COUNT;
 
 import com.fazecast.jSerialComm.SerialPort;
 
@@ -28,11 +28,11 @@ public class ApplicationConfiguration {
     private String stopBits = STOP_BITS;
     private int thermalSensorCount = THERMAL_SENSOR_COUNT;
     private int smokeSensorCount = SMOKE_SENSOR_COUNT;
+    private int pressureSensorCount = PRESSURE_SENSOR_COUNT;
     private int fireButtonCount = FIRE_BUTTON_COUNT;
     private int alarmButtonCount = ALARM_BUTTON_COUNT;
     private int crackDoorSensorCount = CRACK_DOOR_SENSOR_COUNT;
     private int glassBreakSensorCount = GLASS_BREAK_SENSOR_COUNT;
-    private int volumeChangeSensorCount = VOLUME_CHANGE_SENSOR_COUNT;
     private int slaveUuid = SLAVE_UUID;
 
     private ApplicationConfiguration() {
@@ -56,6 +56,14 @@ public class ApplicationConfiguration {
 
     public void setSmokeSensorCount(int smokeSensorCount) {
         this.smokeSensorCount = smokeSensorCount;
+    }
+
+    public int getPressureSensorCount() {
+        return pressureSensorCount;
+    }
+
+    public void setPressureSensorCount(int pressureSensorCount) {
+        this.pressureSensorCount = pressureSensorCount;
     }
 
     public int getFireButtonCount() {
@@ -88,14 +96,6 @@ public class ApplicationConfiguration {
 
     public void setGlassBreakSensorCount(int glassBreakSensorCount) {
         this.glassBreakSensorCount = glassBreakSensorCount;
-    }
-
-    public int getVolumeChangeSensorCount() {
-        return volumeChangeSensorCount;
-    }
-
-    public void setVolumeChangeSensorCount(int volumeChangeSensorCount) {
-        this.volumeChangeSensorCount = volumeChangeSensorCount;
     }
 
     public int getSlaveAdress() {

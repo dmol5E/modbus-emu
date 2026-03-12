@@ -1,150 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Font?>
 
-<GridPane alignment="BASELINE_CENTER" blendMode="SRC_OVER" cache="false" gridLinesVisible="false" hgap="0.0" maxHeight="-Infinity" maxWidth="722.0" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="true" prefHeight="-1.0" prefWidth="-1.0" rotate="0.0" snapToPixel="false" vgap="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.reminder.edu.controller.SlaveController">
-  <children>
-    <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="722.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1.7976931348623157E308" GridPane.columnIndex="0" GridPane.rowIndex="0">
-      <tabs>
-        <Tab text="Параметры интерфейса">
-          <content>
-            <VBox alignment="TOP_CENTER" prefHeight="200.0">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/22.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.reminder.edu.controller.SlaveController">
+   <children>
+      <VBox prefHeight="800.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" style="-fx-background-color: #e0e0e0;" VBox.vgrow="NEVER">
                <children>
-                 <HBox prefHeight="16.0" prefWidth="722.0" />
-                 <ImageView fitHeight="141.98828125" fitWidth="446.0" opacity="0.31" pickOnBounds="true" preserveRatio="true">
-                   <image>
-                     <Image url="@/fxml/logo-modbus-1024x326.png" />
-                   </image>
-                 </ImageView>
-                 <HBox prefHeight="21.0" prefWidth="722.0" />
-                 <HBox>
-                    <children>
-                      <GridPane alignment="CENTER" hgap="5.0" prefHeight="93.0" prefWidth="191.0" styleClass="configPane" vgap="5.0">
-                        <children>
-                          <Label text="Адрес Slave:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                          <TextField prefWidth="150.0" GridPane.columnIndex="1" />
-                        </children>
-                        <columnConstraints>
-                          <ColumnConstraints maxWidth="73.0" prefWidth="71.0" />
-                          <ColumnConstraints maxWidth="142.0" prefWidth="95.0" />
-                        </columnConstraints>
-                        <padding>
-                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                        </padding>
-                        <rowConstraints>
-                          <RowConstraints />
-                        </rowConstraints>
-                      </GridPane>
-                      <GridPane hgap="5.0" prefWidth="517.0" styleClass="configPane" vgap="5.0">
-                        <children>
-                          <Label text="Порт:" textAlignment="LEFT" GridPane.halignment="RIGHT" />
-                          <ComboBox fx:id="portNames" prefWidth="150.0" GridPane.columnIndex="1" />
-                          <Label text="Скорость (бит/с):" textAlignment="LEFT" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                          <ComboBox fx:id="baudRate" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                          <Label text="Четность:" textAlignment="LEFT" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                          <ComboBox fx:id="parity" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                          <Label text="Биты данных:" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
-                          <ComboBox fx:id="dataBits" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-                          <Label text="Стоповые биты:" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                          <ComboBox fx:id="stopBits" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                          <Label text="Управление потоком:" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                          <ComboBox fx:id="flowControl" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                        </children>
-                        <columnConstraints>
-                          <ColumnConstraints maxWidth="101.0" prefWidth="97.0" />
-                          <ColumnConstraints maxWidth="147.0" prefWidth="113.0" />
-                          <ColumnConstraints maxWidth="151.0" prefWidth="145.0" />
-                          <ColumnConstraints maxWidth="149.0" prefWidth="118.0" />
-                        </columnConstraints>
-                        <padding>
-                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                        </padding>
-                        <rowConstraints>
-                          <RowConstraints maxHeight="21.0" prefHeight="21.0" />
-                          <RowConstraints maxHeight="21.0" prefHeight="21.0" />
-                          <RowConstraints maxHeight="21.0" prefHeight="21.0" />
-                        </rowConstraints>
-                      </GridPane>
-                    </children>
-                 </HBox>
-                 <HBox alignment="BASELINE_RIGHT" prefHeight="30.0" prefWidth="722.0" styleClass="configPane">
-                    <children>
-                      <Button onAction="#handleOpenConnection" text="Открыть" />
-                      <Text opacity="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="false" wrappingWidth="5.0" />
-                      <Button onAction="#handleCloseConnection" text="Закрыть" />
-                      <Text opacity="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="false" wrappingWidth="32.0" />
-                    </children>
-                   <padding>
-                     <Insets top="5.0" />
-                   </padding>
-                 </HBox>
+                  <Label text="Порт:">
+                     <HBox.margin>
+                        <Insets left="10.0" right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <ComboBox fx:id="portNames" prefWidth="150.0" />
+                  <Label text="Скорость:">
+                     <HBox.margin>
+                        <Insets left="20.0" right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <ComboBox fx:id="baudRate" prefWidth="100.0" />
+                  <Label text="Биты данных:">
+                     <HBox.margin>
+                        <Insets left="20.0" right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <ComboBox fx:id="dataBits" prefWidth="80.0" />
+                  <Label text="Чётность:">
+                     <HBox.margin>
+                        <Insets left="20.0" right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <ComboBox fx:id="parity" prefWidth="100.0" />
+                  <Label text="Стоп-биты:">
+                     <HBox.margin>
+                        <Insets left="20.0" right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <ComboBox fx:id="stopBits" prefWidth="80.0" />
+                  <Button fx:id="btnOpen" onAction="#handleOpenConnection" text="Подключить">
+                     <HBox.margin>
+                        <Insets left="20.0" right="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnClose" onAction="#handleCloseConnection" text="Отключить">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
-            </VBox>
-          </content>
-        </Tab>
-        <Tab text="Регистры Modbus">
-          <content>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0">
-              <content>
-                <TableView fx:id="registersTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="317.0" prefWidth="720.0" tableMenuButtonVisible="false">
-                  <columns>
-                    <TableColumn fx:id="registerNumberCol" maxWidth="5000.0" minWidth="10.0" prefWidth="114.0" text="Адрес регистра" />
-                    <TableColumn fx:id="registerValueCol" maxWidth="5000.0" minWidth="10.0" prefWidth="142.0" text="Значение регистра" />
-                    <TableColumn fx:id="commentCol" maxWidth="5000.0" minWidth="10.0" prefWidth="452.0" text="Комментарий" />
-                  </columns>
-                </TableView>
-              </content>
-            </ScrollPane>
-          </content>
-        </Tab>
-        <Tab text="Логические ячейки Modbus">
-          <content>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0">
-              <content>
-                <TableView fx:id="digOutsTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="317.0" prefWidth="720.0" tableMenuButtonVisible="false">
-                  <columns>
-                    <TableColumn fx:id="digOutAdressCol" maxWidth="5000.0" minWidth="10.0" prefWidth="94.0" text="Адрес ячейки" />
-                    <TableColumn fx:id="digOutValueCol" maxWidth="5000.0" minWidth="10.0" prefWidth="113.0" text="Значение ячейки" />
-                    <TableColumn fx:id="digOutTargetCol" maxWidth="5000.0" minWidth="10.0" prefWidth="219.0" text="Назначение ячейки" />
-                    <TableColumn fx:id="digOutCommentCol" maxWidth="5000.0" minWidth="10.0" prefWidth="282.0" text="Комментарий" />
-                  </columns>
-                </TableView>
-              </content>
-            </ScrollPane>
-          </content>
-        </Tab>
-      </tabs>
-    </TabPane>
-    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="722.0" vbarPolicy="AS_NEEDED" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-      <content>
-        <TextArea fx:id="logArea" maxHeight="1.7976931348623157E308" maxWidth="720.0" minHeight="50.0" minWidth="-Infinity" prefHeight="198.0" prefWidth="720.0" text="t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;t&#10;" wrapText="true" />
-      </content>
-    </ScrollPane>
-  </children>
-  <columnConstraints>
-    <ColumnConstraints />
-    <ColumnConstraints percentWidth="0.0" />
-  </columnConstraints>
-  <padding>
-    <Insets />
-  </padding>
-  <rowConstraints>
-    <RowConstraints />
-    <RowConstraints />
-  </rowConstraints>
-  <stylesheets>
-    <!--<URL value="@/styles/main.css"></URL>-->
-  </stylesheets>
-</GridPane>
+            </HBox>
+            <SplitPane dividerPositions="0.65" orientation="VERTICAL" VBox.vgrow="ALWAYS">
+               <items>
+                  <ScrollPane fitToHeight="true" fitToWidth="true">
+                     <content>
+                        <TableView fx:id="sensorsTable" prefHeight="400.0" prefWidth="1178.0">
+                          <columns>
+                            <TableColumn fx:id="sensorIdCol" prefWidth="50.0" text="ID" />
+                            <TableColumn fx:id="sensorTypeCol" prefWidth="120.0" text="Тип" />
+                            <TableColumn fx:id="sensorNameCol" prefWidth="200.0" text="Имя" />
+                            <TableColumn fx:id="sensorAddressCol" prefWidth="70.0" text="Адрес" />
+                            <TableColumn fx:id="sensorEnabledCol" prefWidth="60.0" text="Вкл" />
+                            <TableColumn fx:id="sensorStateCol" prefWidth="120.0" text="Состояние" />
+                            <TableColumn fx:id="sensorValueCol" prefWidth="150.0" text="Значение" />
+                            <TableColumn fx:id="sensorActionsCol" prefWidth="250.0" text="Действия" />
+                          </columns>
+                        </TableView>
+                     </content>
+                  </ScrollPane>
+                  <VBox prefHeight="200.0">
+                     <children>
+                        <Label text="Лог событий:">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets left="10.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextArea fx:id="logArea" editable="false" prefHeight="150.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </items>
+            </SplitPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

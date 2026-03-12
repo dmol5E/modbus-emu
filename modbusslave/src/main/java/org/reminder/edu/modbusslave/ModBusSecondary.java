@@ -1,39 +1,29 @@
 package org.reminder.edu.modbusslave;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.reminder.edu.configuration.ApplicationConfiguration;
-import org.reminder.edu.modbusslave.comm.CoilSensorMapper;
-import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
+import org.reminder.edu.modbusslave.comm.ModbusProcessImage;
+import org.reminder.edu.modbusslave.entity.Sensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.digitalpetri.modbus.serial.server.SerialPortServerTransport;
 import com.digitalpetri.modbus.server.ModbusRtuServer;
-import com.digitalpetri.modbus.server.ProcessImage;
 import com.digitalpetri.modbus.server.ReadWriteModbusServices;
 import com.fazecast.jSerialComm.SerialPort;
 import com.google.inject.Inject;
 
-import net.wimpi.modbus.procimg.DigitalOut;
-import net.wimpi.modbus.procimg.ObservableDigitalOut;
-import net.wimpi.modbus.procimg.Register;
-import net.wimpi.modbus.procimg.SimpleProcessImage;
-
 public final class ModBusSecondary {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ModBusSecondary.class);
 
-    private List<DataRegisterSensor> sensors;
-    private final List<DigitalOut> digOuts = new ArrayList<>();
-    private final List<Register> registers = new ArrayList<>();
-    private final List<CoilSensorMapper> mappers = new ArrayList<>();
+    private final List<Sensor> sensors;
+    private final ModbusProcessImage modbusProcessImage;
 
     private String portName;
     private int baudRate;
@@ -42,24 +32,19 @@ public final class ModBusSecondary {
     private String stopBits;
     private String flowControl;
     private int slaveId;
-    private Thread currentModBusListener;
     private Map<String, Integer> parityMapping;
-    ModbusRtuServer server;
+    private ModbusRtuServer server;
 
     @Inject
     public ModBusSecondary() {
-        sensors = Helper.createSensorsFromConfiguration();
+        this.modbusProcessImage = new ModbusProcessImage();
+        this.sensors = Helper.createSensorsFromConfiguration(modbusProcessImage);
 
-        for (DataRegisterSensor sensor : sensors) {
-            registers.add(sensor.getRegister());
-
-            List<ObservableDigitalOut> digs = Helper.createFourObservableDigitalOut();
-            mappers.add(new CoilSensorMapper(sensor, digs));
-            digOuts.addAll(digs);
+        for (Sensor sensor : sensors) {
+            modbusProcessImage.addSensor(sensor);
         }
 
-        ApplicationConfiguration appConfig = ApplicationConfiguration
-                .getInstance();
+        ApplicationConfiguration appConfig = ApplicationConfiguration.getInstance();
 
         this.portName = "COM1";
         this.baudRate = appConfig.getBaudRate();
@@ -76,42 +61,19 @@ public final class ModBusSecondary {
         this.slaveId = appConfig.getSlaveUuid();
     }
 
-    protected SimpleProcessImage buildSimpleProcessImage() {
-        SimpleProcessImage spi = new SimpleProcessImage();
-
-        for (DigitalOut digIut : digOuts) {
-            spi.addDigitalOut(digIut);
-        }
-
-        for (Register register : registers) {
-            spi.addInputRegister(register);
-        }
-
-        return spi;
-    }
-
     public void startModbusListener() {
-        ProcessImage processImage = new ProcessImage();
-
-        ReadWriteModbusServices modbusServices = new ReadWriteModbusServices() {
-
-            @Override
-            protected Optional<ProcessImage> getProcessImage(int unitId) {
-                return Optional.of(processImage);
-            }
-            
-        };
+        ReadWriteModbusServices modbusServices = modbusProcessImage.createModbusServices();
 
         server = ModbusRtuServer.create(
-          SerialPortServerTransport.create(
-            cfg -> {
-                cfg.serialPort = portName;
-                cfg.baudRate = baudRate;
-                cfg.parity = parity;
-                cfg.stopBits = Integer.parseInt(stopBits);
-            }
-          ),
-          modbusServices);
+            SerialPortServerTransport.create(
+                cfg -> {
+                    cfg.serialPort = portName;
+                    cfg.baudRate = baudRate;
+                    cfg.parity = parity;
+                    cfg.stopBits = Integer.parseInt(stopBits);
+                }
+            ),
+            modbusServices);
         try {
             server.start();
             logger.info("Modbus server started on port: {}", this.portName);
@@ -159,12 +121,12 @@ public final class ModBusSecondary {
         this.slaveId = slaveId;
     }
 
-    public List<DataRegisterSensor> getSensors() {
+    public List<Sensor> getSensors() {
         return sensors;
     }
 
-    public List<CoilSensorMapper> getMappers() {
-        return mappers;
+    public ModbusProcessImage getModbusProcessImage() {
+        return modbusProcessImage;
     }
 
     public Set<String> getParityValues() {
