@@ -4,9 +4,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import org.reminder.edu.modbusslave.ModBusSecondary;
-import org.reminder.edu.modbusslave.entity.Sensor;
-import org.reminder.edu.modbusslave.entity.enums.SensorState;
-import org.reminder.edu.modbusslave.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 import org.reminder.edu.modbusslave.logging.LogAppenderManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +104,7 @@ public class SlaveController implements Initializable {
         for (SerialPort serialPort : ports) {
             portNamesItems.add(serialPort.getSystemPortName());
         }
+        portNamesItems.add("/tmp/ttyV0");
         if (!portNamesItems.isEmpty()) {
             portNames.setValue(portNamesItems.get(0));
         }

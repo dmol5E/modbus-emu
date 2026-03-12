@@ -8,7 +8,8 @@ import java.util.concurrent.ExecutionException;
 
 import org.reminder.edu.configuration.ApplicationConfiguration;
 import org.reminder.edu.modbusslave.comm.ModbusProcessImage;
-import org.reminder.edu.modbusslave.entity.Sensor;
+import org.reminder.edu.modbuscommon.Helper;
+import org.reminder.edu.modbuscommon.entity.Sensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public final class ModBusSecondary {
     @Inject
     public ModBusSecondary() {
         this.modbusProcessImage = new ModbusProcessImage();
-        this.sensors = Helper.createSensorsFromConfiguration(modbusProcessImage);
+        this.sensors = Helper.createSensorsFromConfiguration();
 
         for (Sensor sensor : sensors) {
             modbusProcessImage.addSensor(sensor);
@@ -130,6 +131,6 @@ public final class ModBusSecondary {
     }
 
     public Set<String> getParityValues() {
-        return this.parityMapping.keySet();
+    return this.parityMapping.keySet();
     }
 }

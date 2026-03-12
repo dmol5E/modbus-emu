@@ -1,7 +1,7 @@
-package org.reminder.edu.modbusslave.entity;
+package org.reminder.edu.modbuscommon.entity;
 
-import org.reminder.edu.modbusslave.entity.enums.SensorState;
-import org.reminder.edu.modbusslave.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -26,6 +26,10 @@ public interface Sensor {
 
     void setState(SensorState state);
 
+    void setState(int stateCode);
+
+    int getStateCode();
+
     ReadOnlyObjectProperty<SensorState> stateProperty();
 
     StringProperty nameProperty();
@@ -37,6 +41,18 @@ public interface Sensor {
     void turnOn();
 
     void turnOff();
+
+    boolean isOn();
+
+    void onSensor();
+
+    void offSensor();
+
+    void setNormalStatus();
+
+    void setAlarmStatus();
+
+    void setDefectStatus();
 
     Object getValue();
 

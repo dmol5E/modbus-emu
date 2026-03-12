@@ -3,15 +3,18 @@ package org.reminder.edu.controller;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
 import org.reminder.edu.MessagePrinter;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
 import org.reminder.edu.model.MasterModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import gnu.io.CommPortIdentifier;
+import com.fazecast.jSerialComm.SerialPort;
+import com.google.inject.Inject;
+
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,9 +23,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import net.wimpi.modbus.util.SerialParameters;
 
 public class MasterController implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MasterController.class);
 
     @FXML
     private TextField slaveId;
@@ -100,23 +104,23 @@ public class MasterController implements Initializable {
     private TextArea logArea;
     
     private MessagePrinter messageRenderer;
-    
-    private MasterModel model;
-    
-    private Collection<Button> sensorButtons;
-    
-    
+
+    private final MasterModel model;
+
+    @Inject
+    public MasterController(MasterModel model) {
+        this.model = model;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        model = new MasterModel();
         
         final ObservableList<String> portNamesItems = portNames.getItems();
-        Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
-        while (portList.hasMoreElements()) {
-            CommPortIdentifier portId = (CommPortIdentifier) portList
-                    .nextElement();
-            portNamesItems.add(portId.getName());
+        SerialPort[] ports = SerialPort.getCommPorts();
+        for (SerialPort serialPort : ports) {
+            portNamesItems.add(serialPort.getSystemPortName());
         }
+        portNamesItems.add("/tmp/ttyV1");
         
         final ObservableList<Integer> dataBitsItems = dataBits.getItems();
         dataBitsItems.add(4);
@@ -138,6 +142,7 @@ public class MasterController implements Initializable {
         parityItems.add("None");
         parityItems.add("Even");
         parityItems.add("Odd");
+        parityItems.add("Space");
         parity.getSelectionModel().select(0);
 
         final ObservableList<String> stopBitsItems = stopBits.getItems();
@@ -148,16 +153,9 @@ public class MasterController implements Initializable {
 
         final ObservableList<String> flowControlItems = flowControl.getItems();
         flowControlItems.add("None");
-        // flowControlItems.add("xon/xoff out");
-        flowControlItems.add("xon/xoff in");
-        flowControlItems.add("rts/cts in");
-        // flowControlItems.add("rts/cts out");
         flowControl.getSelectionModel().select(0);
         
-        //this.messageRenderer = new TextAreaAdapter(logArea);
-        this.model.setMessageRenderer(messageRenderer);
-        
-        this.sensorButtons = new ArrayList<Button>(15);
+        Collection<Button> sensorButtons = new ArrayList<Button>(15);
         sensorButtons.add(td1);
         sensorButtons.add(td2);
         sensorButtons.add(dd3);
@@ -175,53 +173,66 @@ public class MasterController implements Initializable {
         sensorButtons.add(do15);
         
         Iterator<SensorProxy> proxies = model.getSensors().iterator();
-        for (Button button: sensorButtons) {
-            proxies.next().setButton(button);
+        for (Button button : sensorButtons) {
+            if (proxies.hasNext()) {
+                proxies.next().setButton(button);
+            }
         }
     }    
 
     @FXML
     private void handleOpenConnection(ActionEvent event) {
+        logArea.clear();
         
-        SerialParameters params = new SerialParameters();
-
-        params.setPortName(portNames.getValue());
-        params.setBaudRate(baudRate.getValue());
-        params.setDatabits(dataBits.getValue());
-        params.setParity(parity.getValue());
-        params.setStopbits(stopBits.getValue());
-        params.setFlowControlIn(flowControl.getValue());
+        if (portNames.getValue() == null) {
+            logArea.appendText("Error: No port selected\n");
+            return;
+        }
 
         try {
-            model.openConnection(params, new Integer(slaveId.getText()));
+            model.openConnection(
+                portNames.getValue(),
+                baudRate.getValue(),
+                dataBits.getValue(),
+                parity.getValue(),
+                stopBits.getValue(),
+                Integer.parseInt(slaveId.getText())
+            );
+            logArea.appendText("Connection opened successfully\n");
+            logger.info("Connection opened on port {}", portNames.getValue());
         } catch (Exception e) {
-            e.printStackTrace();
+            logArea.appendText("Error opening connection: " + e.getMessage() + "\n");
+            logger.error("Error opening connection", e);
         }
     }
 
     @FXML
     private void handleCloseConnection(ActionEvent event) {
-        model.closeConnection();
+        try {
+            model.closeConnection();
+            logArea.appendText("Connection closed\n");
+            logger.info("Connection closed");
+        } catch (Exception e) {
+            logArea.appendText("Error closing connection: " + e.getMessage() + "\n");
+            logger.error("Error closing connection", e);
+        }
     }
     
     @FXML
-    private void handleSensorStateRequest(ActionEvent event) throws Exception {
-        if (!model.isOpenConnection())
+    private void handleSensorStateRequest(ActionEvent event) {
+        if (!model.isOpenConnection()) {
+            logArea.appendText("Error: Not connected\n");
             return;
+        }
         
-        for (SensorProxy sensor: model.getSensors()) {
-            sensor.update();
-            switch(sensor.getStateCode()) {
-            case 0:
-                sensor.getButton().setStyle("-fx-background-color: green");
-                break;
-            case 1:
-                sensor.getButton().setStyle("-fx-background-color: red");
-                break;
-            case 2:
-                sensor.getButton().setStyle("-fx-background-color: yellow");
-                break;
+        try {
+            for (SensorProxy sensor : model.getSensors()) {
+                sensor.update();
             }
+            logArea.appendText("Sensor states updated\n");
+        } catch (Exception e) {
+            logArea.appendText("Error updating sensors: " + e.getMessage() + "\n");
+            logger.error("Error updating sensors", e);
         }
     }
 }

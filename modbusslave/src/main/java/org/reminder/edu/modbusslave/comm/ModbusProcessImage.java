@@ -1,8 +1,8 @@
 package org.reminder.edu.modbusslave.comm;
 
-import org.reminder.edu.modbusslave.entity.Sensor;
-import org.reminder.edu.modbusslave.entity.enums.SensorState;
-import org.reminder.edu.modbusslave.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

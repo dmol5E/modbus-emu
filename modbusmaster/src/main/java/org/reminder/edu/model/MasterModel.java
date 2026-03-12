@@ -1,67 +1,102 @@
 package org.reminder.edu.model;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import org.reminder.edu.MessagePrinter;
+import org.reminder.edu.modbuscommon.Helper;
+import org.reminder.edu.modbuscommon.entity.Sensor;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
-import org.reminder.edu.modbusslave.Helper;
-import org.reminder.edu.modbusslave.comm.DataRegisterSensor;
-import org.reminder.edu.modbusslave.entity.Sensor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.wimpi.modbus.net.SerialConnection;
-import net.wimpi.modbus.util.SerialParameters;
+import com.digitalpetri.modbus.client.ModbusRtuClient;
+import com.digitalpetri.modbus.serial.client.SerialPortClientTransport;
+import com.fazecast.jSerialComm.SerialPort;
 
 public class MasterModel {
 
-    private SerialConnection connection;
+    private static final Logger logger = LoggerFactory.getLogger(MasterModel.class);
 
+    private ModbusRtuClient client;
     private int baudRate;
     private int dataBits;
     private String flowControl;
-    private int masterId;
     private String parity;
     private String portName;
     private int slaveId;
     private String stopBits;
-    
-    private Collection<SensorProxy> sensors;
-    private MessagePrinter messageRenderer;
-    
+
+    private final Collection<SensorProxy> sensors;
+
+    private static final Map<String, Integer> PARITY_MAPPING = new HashMap<>();
+
+    static {
+        PARITY_MAPPING.put("None", SerialPort.NO_PARITY);
+        PARITY_MAPPING.put("Odd", SerialPort.ODD_PARITY);
+        PARITY_MAPPING.put("Even", SerialPort.EVEN_PARITY);
+        PARITY_MAPPING.put("Space", SerialPort.SPACE_PARITY);
+    }
+
     public MasterModel() {
-        List<DataRegisterSensor> originSensors = Helper.createSensorsFromConfiguration();
-        sensors = new LinkedList<SensorProxy>();
-        for (Sensor sensor: originSensors) {
+        List<Sensor> originSensors = Helper.createSensorsFromConfiguration();
+        sensors = new LinkedList<>();
+        for (Sensor sensor : originSensors) {
             sensors.add(new SensorProxy(sensor));
         }
     }
 
-    public void openConnection(SerialParameters params, int slaveId) throws Exception {
-        if (isOpenConnection())
+    public void openConnection(String portName, int baudRate, int dataBits,
+                              String parity, String stopBits, int slaveId) throws Exception {
+        if (isOpenConnection()) {
             return;
-        connection = new SerialConnection(params);
-        connection.open();
-        for (SensorProxy sensor: sensors) {
-            sensor.setConnection(connection);
+        }
+
+        this.portName = portName;
+        this.baudRate = baudRate;
+        this.dataBits = dataBits;
+        this.parity = parity;
+        this.stopBits = stopBits;
+        this.slaveId = slaveId;
+
+        SerialPortClientTransport transport = SerialPortClientTransport.create(cfg -> {
+            cfg.serialPort = portName;
+            cfg.baudRate = baudRate;
+            cfg.dataBits = dataBits;
+            cfg.parity = PARITY_MAPPING.getOrDefault(parity, SerialPort.NO_PARITY);
+            cfg.stopBits = Integer.parseInt(stopBits);
+        });
+
+        client = ModbusRtuClient.create(transport);
+        client.connect();
+
+        for (SensorProxy sensor : sensors) {
+            sensor.setClient(client);
             sensor.setSlaveId(slaveId);
         }
+
+        logger.info("Connection opened on port {} with baud rate {}", portName, baudRate);
     }
-    
+
     public void closeConnection() {
-        if (!isOpenConnection())
+        if (!isOpenConnection()) {
             return;
-        connection.close();
+        }
+        try {
+            client.disconnect();
+            client = null;
+            logger.info("Connection closed");
+        } catch (Exception e) {
+            logger.error("Error closing connection", e);
+        }
     }
-    
-    public SerialConnection getSerialConnection() {
-        return this.connection;
-    }
-    
+
     public boolean isOpenConnection() {
-        return connection == null ? false : connection.isOpen();
+        return client != null && client.isConnected();
     }
-    
+
     public Collection<SensorProxy> getSensors() {
         return sensors;
     }
@@ -88,14 +123,6 @@ public class MasterModel {
 
     public void setFlowControl(String flowControl) {
         this.flowControl = flowControl;
-    }
-
-    public int getMasterId() {
-        return masterId;
-    }
-
-    public void setMasterId(int masterId) {
-        this.masterId = masterId;
     }
 
     public String getParity() {
@@ -128,13 +155,5 @@ public class MasterModel {
 
     public void setStopBits(String stopBits) {
         this.stopBits = stopBits;
-    }
-
-    public MessagePrinter getMessageRenderer() {
-        return messageRenderer;
-    }
-
-    public void setMessageRenderer(MessagePrinter messageRenderer) {
-        this.messageRenderer = messageRenderer;
     }
 }

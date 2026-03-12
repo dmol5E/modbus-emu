@@ -1,13 +1,13 @@
-package org.reminder.edu.modbusslave.entity.sensors;
+package org.reminder.edu.modbuscommon.entity.sensors;
 
-import org.reminder.edu.modbusslave.entity.AbstractSensor;
-import org.reminder.edu.modbusslave.entity.enums.SensorState;
-import org.reminder.edu.modbusslave.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.AbstractSensor;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
-public class AlarmButton extends AbstractSensor {
+public class FireButton extends AbstractSensor {
 
-    public AlarmButton() {
-        super(SensorType.ALARM_BUTTON, "Тревожная кнопка", "ТК");
+    public FireButton() {
+        super(SensorType.FIRE_BUTTON, "Пожарная кнопка", "ПК");
     }
 
     @Override

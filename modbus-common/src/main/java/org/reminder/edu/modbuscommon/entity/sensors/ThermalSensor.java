@@ -1,8 +1,8 @@
-package org.reminder.edu.modbusslave.entity.sensors;
+package org.reminder.edu.modbuscommon.entity.sensors;
 
-import org.reminder.edu.modbusslave.entity.AbstractSensor;
-import org.reminder.edu.modbusslave.entity.enums.SensorState;
-import org.reminder.edu.modbusslave.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.AbstractSensor;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
 public class ThermalSensor extends AbstractSensor {
 

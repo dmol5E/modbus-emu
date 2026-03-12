@@ -1,7 +1,7 @@
-package org.reminder.edu.modbusslave.entity;
+package org.reminder.edu.modbuscommon.entity;
 
-import org.reminder.edu.modbusslave.entity.enums.SensorState;
-import org.reminder.edu.modbusslave.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -83,6 +83,68 @@ public abstract class AbstractSensor implements Sensor {
     @Override
     public void setState(SensorState state) {
         this.state.set(state);
+    }
+
+    @Override
+    public void setState(int stateCode) {
+        switch (stateCode) {
+            case 1:
+                setState(SensorState.NORMAL);
+                break;
+            case 2:
+                setState(SensorState.ALARM);
+                break;
+            case 3:
+                setState(SensorState.FAULT);
+                break;
+            default:
+                setState(SensorState.NORMAL);
+        }
+    }
+
+    @Override
+    public int getStateCode() {
+        SensorState currentState = getState();
+        switch (currentState) {
+            case NORMAL:
+                return 1;
+            case ALARM:
+                return 2;
+            case FAULT:
+                return 3;
+            default:
+                return 0;
+        }
+    }
+
+    @Override
+    public boolean isOn() {
+        return isEnabled();
+    }
+
+    @Override
+    public void onSensor() {
+        setEnabled(true);
+    }
+
+    @Override
+    public void offSensor() {
+        setEnabled(false);
+    }
+
+    @Override
+    public void setNormalStatus() {
+        setState(SensorState.NORMAL);
+    }
+
+    @Override
+    public void setAlarmStatus() {
+        setState(SensorState.ALARM);
+    }
+
+    @Override
+    public void setDefectStatus() {
+        setState(SensorState.FAULT);
     }
 
     @Override

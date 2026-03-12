@@ -1,4 +1,4 @@
-package org.reminder.edu.modbusslave.entity.enums;
+package org.reminder.edu.modbuscommon.entity.enums;
 
 public enum SensorState {
     NORMAL("НОРМА"),
