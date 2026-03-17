@@ -1,23 +1,21 @@
 package org.reminder.edu.modbusslave;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-import org.reminder.edu.configuration.ApplicationConfiguration;
-import org.reminder.edu.modbusslave.comm.ModbusProcessImage;
-import org.reminder.edu.modbuscommon.Helper;
-import org.reminder.edu.modbuscommon.entity.Sensor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.digitalpetri.modbus.serial.server.SerialPortServerTransport;
 import com.digitalpetri.modbus.server.ModbusRtuServer;
 import com.digitalpetri.modbus.server.ReadWriteModbusServices;
 import com.fazecast.jSerialComm.SerialPort;
 import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import org.reminder.edu.configuration.ApplicationConfiguration;
+import org.reminder.edu.modbuscommon.Helper;
+import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbusslave.comm.ModbusProcessImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ModBusSecondary {
 
@@ -66,15 +64,14 @@ public final class ModBusSecondary {
         ReadWriteModbusServices modbusServices = modbusProcessImage.createModbusServices();
 
         server = ModbusRtuServer.create(
-            SerialPortServerTransport.create(
-                cfg -> {
-                    cfg.serialPort = portName;
-                    cfg.baudRate = baudRate;
-                    cfg.parity = parity;
-                    cfg.stopBits = Integer.parseInt(stopBits);
-                }
-            ),
-            modbusServices);
+            SerialPortServerTransport.create(cfg -> {
+                cfg.serialPort = portName;
+                cfg.baudRate = baudRate;
+                cfg.parity = parity;
+                cfg.stopBits = Integer.parseInt(stopBits);
+            }),
+            modbusServices
+        );
         try {
             server.start();
             logger.info("Modbus server started on port: {}", this.portName);
@@ -131,6 +128,6 @@ public final class ModBusSecondary {
     }
 
     public Set<String> getParityValues() {
-    return this.parityMapping.keySet();
+        return this.parityMapping.keySet();
     }
 }

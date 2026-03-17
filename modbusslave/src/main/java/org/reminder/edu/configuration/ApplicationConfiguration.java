@@ -6,7 +6,6 @@ import static org.reminder.edu.configuration.DefaultConfiguration.CRACK_DOOR_SEN
 import static org.reminder.edu.configuration.DefaultConfiguration.DATA_BITS;
 import static org.reminder.edu.configuration.DefaultConfiguration.FIRE_BUTTON_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.GLASS_BREAK_SENSOR_COUNT;
-import static org.reminder.edu.configuration.DefaultConfiguration.PARITY;
 import static org.reminder.edu.configuration.DefaultConfiguration.PRESSURE_SENSOR_COUNT;
 import static org.reminder.edu.configuration.DefaultConfiguration.SLAVE_ADRESS;
 import static org.reminder.edu.configuration.DefaultConfiguration.SLAVE_UUID;
@@ -35,8 +34,7 @@ public class ApplicationConfiguration {
     private int glassBreakSensorCount = GLASS_BREAK_SENSOR_COUNT;
     private int slaveUuid = SLAVE_UUID;
 
-    private ApplicationConfiguration() {
-    }
+    private ApplicationConfiguration() {}
 
     public int getMeasuringDeviceCount() {
         return MEASURING_DEVICE_COUNT;

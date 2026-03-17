@@ -1,15 +1,12 @@
 package org.reminder.edu.modbuscommon.entity;
 
-import org.reminder.edu.modbuscommon.entity.enums.SensorState;
-import org.reminder.edu.modbuscommon.entity.enums.SensorType;
-
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.StringProperty;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
 public interface Sensor {
-
     int getId();
 
     SensorType getType();

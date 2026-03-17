@@ -1,20 +1,12 @@
 package org.reminder.edu.controller;
 
+import com.fazecast.jSerialComm.SerialPort;
+import com.google.inject.Inject;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ResourceBundle;
-
-import org.reminder.edu.MessagePrinter;
-import org.reminder.edu.modbusmaster.entity.SensorProxy;
-import org.reminder.edu.model.MasterModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fazecast.jSerialComm.SerialPort;
-import com.google.inject.Inject;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,6 +15,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.reminder.edu.modbusmaster.entity.SensorProxy;
+import org.reminder.edu.model.MasterModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MasterController implements Initializable {
 
@@ -30,7 +26,7 @@ public class MasterController implements Initializable {
 
     @FXML
     private TextField slaveId;
-    
+
     @FXML
     private ComboBox<String> portNames;
 
@@ -48,62 +44,60 @@ public class MasterController implements Initializable {
 
     @FXML
     private ComboBox<String> flowControl;
-    
+
     @FXML
     private Button btnOpen;
 
     @FXML
     private Button btnClose;
-    
+
     @FXML
     private Button td1;
-    
+
     @FXML
     private Button td2;
-    
+
     @FXML
     private Button dd3;
-    
+
     @FXML
     private Button dd4;
-    
+
     @FXML
     private Button pk5;
-    
+
     @FXML
     private Button tk6;
-    
+
     @FXML
     private Button tk7;
-    
+
     @FXML
     private Button dv8;
-    
+
     @FXML
     private Button dv9;
-    
+
     @FXML
     private Button ds10;
-    
+
     @FXML
     private Button ds11;
 
     @FXML
     private Button ds12;
-    
+
     @FXML
     private Button do13;
-    
+
     @FXML
     private Button do14;
-    
+
     @FXML
     private Button do15;
-    
+
     @FXML
     private TextArea logArea;
-    
-    private MessagePrinter messageRenderer;
 
     private final MasterModel model;
 
@@ -114,14 +108,13 @@ public class MasterController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
         final ObservableList<String> portNamesItems = portNames.getItems();
         SerialPort[] ports = SerialPort.getCommPorts();
         for (SerialPort serialPort : ports) {
             portNamesItems.add(serialPort.getSystemPortName());
         }
-        portNamesItems.add("/tmp/ttyV1");
-        
+        //portNamesItems.add("/tmp/ttyV1");
+
         final ObservableList<Integer> dataBitsItems = dataBits.getItems();
         dataBitsItems.add(4);
         dataBitsItems.add(5);
@@ -154,7 +147,7 @@ public class MasterController implements Initializable {
         final ObservableList<String> flowControlItems = flowControl.getItems();
         flowControlItems.add("None");
         flowControl.getSelectionModel().select(0);
-        
+
         Collection<Button> sensorButtons = new ArrayList<Button>(15);
         sensorButtons.add(td1);
         sensorButtons.add(td2);
@@ -171,19 +164,19 @@ public class MasterController implements Initializable {
         sensorButtons.add(do13);
         sensorButtons.add(do14);
         sensorButtons.add(do15);
-        
+
         Iterator<SensorProxy> proxies = model.getSensors().iterator();
         for (Button button : sensorButtons) {
             if (proxies.hasNext()) {
                 proxies.next().setButton(button);
             }
         }
-    }    
+    }
 
     @FXML
     private void handleOpenConnection(ActionEvent event) {
         logArea.clear();
-        
+
         if (portNames.getValue() == null) {
             logArea.appendText("Error: No port selected\n");
             return;
@@ -217,14 +210,14 @@ public class MasterController implements Initializable {
             logger.error("Error closing connection", e);
         }
     }
-    
+
     @FXML
     private void handleSensorStateRequest(ActionEvent event) {
         if (!model.isOpenConnection()) {
             logArea.appendText("Error: Not connected\n");
             return;
         }
-        
+
         try {
             for (SensorProxy sensor : model.getSensors()) {
                 sensor.update();
