@@ -1,63 +1,164 @@
 package org.reminder.edu.modbuscommon.entity;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
-public interface Sensor {
-    int getId();
+public abstract class Sensor {
 
-    SensorType getType();
+    private static int idCounter = 0;
 
-    String getName();
+    private final int id;
+    private final SensorType type;
+    private final StringProperty name;
+    private final StringProperty shortName;
+    private final StringProperty valueDisplay;
+    private final ReadOnlyObjectWrapper<SensorState> state;
+    private boolean enabled;
+    private int modbusAddress;
 
-    String getShortName();
+    protected Sensor(SensorType type, String baseName, String baseShortName) {
+        this.id = ++idCounter;
+        this.type = type;
+        this.name = new SimpleStringProperty(baseName + " " + id);
+        this.shortName = new SimpleStringProperty(baseShortName + id);
+        this.state = new ReadOnlyObjectWrapper<>(SensorState.NORMAL);
+        this.valueDisplay = new SimpleStringProperty(getDefaultValueDisplay());
+        this.enabled = true;
+        this.modbusAddress = id - 1;
+    }
 
-    boolean isEnabled();
+    public int getId() {
+        return id;
+    }
 
-    void setEnabled(boolean enabled);
+    public SensorType getType() {
+        return type;
+    }
 
-    SensorState getState();
+    public String getName() {
+        return name.get();
+    }
 
-    void setState(SensorState state);
+    public StringProperty nameProperty() {
+        return name;
+    }
 
-    void setState(int stateCode);
+    public String getShortName() {
+        return shortName.get();
+    }
 
-    int getStateCode();
+    public StringProperty shortNameProperty() {
+        return shortName;
+    }
 
-    ReadOnlyObjectProperty<SensorState> stateProperty();
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-    StringProperty nameProperty();
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-    StringProperty shortNameProperty();
+    public SensorState getState() {
+        return state.get();
+    }
 
-    void resetToDefault();
+    public void setState(SensorState state) {
+        this.state.set(state);
+    }
 
-    void turnOn();
+    public void setState(int stateCode) {
+        switch (stateCode) {
+            case 1:
+                setState(SensorState.NORMAL);
+                break;
+            case 2:
+                setState(SensorState.ALARM);
+                break;
+            case 3:
+                setState(SensorState.FAULT);
+                break;
+            default:
+                setState(SensorState.NORMAL);
+        }
+    }
 
-    void turnOff();
+    public int getStateCode() {
+        SensorState currentState = getState();
+        switch (currentState) {
+            case NORMAL:
+                return 1;
+            case ALARM:
+                return 2;
+            case FAULT:
+                return 3;
+            default:
+                return 0;
+        }
+    }
 
-    boolean isOn();
+    public boolean isOn() {
+        return isEnabled();
+    }
 
-    void onSensor();
+    public void onSensor() {
+        setEnabled(true);
+    }
 
-    void offSensor();
+    public void offSensor() {
+        setEnabled(false);
+    }
 
-    void setNormalStatus();
+    public void setNormalStatus() {
+        setState(SensorState.NORMAL);
+    }
 
-    void setAlarmStatus();
+    public void setAlarmStatus() {
+        setState(SensorState.ALARM);
+    }
 
-    void setDefectStatus();
+    public void setDefectStatus() {
+        setState(SensorState.FAULT);
+    }
 
-    Object getValue();
+    public ReadOnlyObjectProperty<SensorState> stateProperty() {
+        return state.getReadOnlyProperty();
+    }
 
-    void setValue(Object value);
+    public int getModbusAddress() {
+        return modbusAddress;
+    }
 
-    ReadOnlyStringProperty valueDisplayProperty();
+    public void setModbusAddress(int address) {
+        this.modbusAddress = address;
+    }
 
-    int getModbusAddress();
+    public ReadOnlyStringProperty valueDisplayProperty() {
+        return valueDisplay;
+    }
 
-    void setModbusAddress(int address);
+    protected void updateValueDisplay(String display) {
+        this.valueDisplay.set(display);
+    }
+
+    protected abstract String getDefaultValueDisplay();
+
+    public void turnOn() {
+        setEnabled(true);
+    }
+
+    public void turnOff() {
+        setEnabled(false);
+    }
+
+    public abstract void resetToDefault();
+
+    public abstract Object getValue();
+
+    public abstract void setValue(Object value);
 }

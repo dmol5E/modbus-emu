@@ -18,17 +18,18 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 
-public class SensorProxy implements Sensor, Updatable {
+public class SensorProxy extends Sensor implements Updatable {
 
     private static final Logger logger = LoggerFactory.getLogger(SensorProxy.class);
 
-    private final Sensor sensor;
+    private final Sensor delegate;
     private Button button;
     private ModbusRtuClient client;
     private int slaveId;
 
     public SensorProxy(Sensor sensor) {
-        this.sensor = sensor;
+        super(sensor.getType(), sensor.getName(), sensor.getShortName());
+        this.delegate = sensor;
     }
 
     public void setClient(ModbusRtuClient client) {
@@ -49,82 +50,82 @@ public class SensorProxy implements Sensor, Updatable {
 
     @Override
     public int getModbusAddress() {
-        return sensor.getModbusAddress();
+        return delegate.getModbusAddress();
     }
 
     @Override
     public void setModbusAddress(int address) {
-        sensor.setModbusAddress(address);
+        delegate.setModbusAddress(address);
     }
 
     @Override
     public javafx.beans.property.ReadOnlyStringProperty valueDisplayProperty() {
-        return sensor.valueDisplayProperty();
+        return delegate.valueDisplayProperty();
     }
 
     @Override
     public String getName() {
-        return sensor.getName();
+        return delegate.getName();
     }
 
     @Override
     public int getId() {
-        return sensor.getId();
+        return delegate.getId();
     }
 
     @Override
     public String getShortName() {
-        return sensor.getShortName();
+        return delegate.getShortName();
     }
 
     @Override
     public SensorState getState() {
-        return sensor.getState();
+        return delegate.getState();
     }
 
     @Override
     public int getStateCode() {
-        return sensor.getStateCode();
+        return delegate.getStateCode();
     }
 
     @Override
     public void setState(int codeState) {
-        sensor.setState(codeState);
+        delegate.setState(codeState);
     }
 
     @Override
     public boolean isOn() {
-        return sensor.isOn();
+        return delegate.isOn();
     }
 
     @Override
     public void onSensor() {
-        sensor.onSensor();
+        delegate.onSensor();
     }
 
     @Override
     public void offSensor() {
-        sensor.offSensor();
+        delegate.offSensor();
     }
 
     @Override
     public void setDefectStatus() {
-        sensor.setDefectStatus();
+        delegate.setDefectStatus();
     }
 
     @Override
     public void setNormalStatus() {
-        sensor.setNormalStatus();
+        delegate.setNormalStatus();
     }
 
     @Override
     public void setAlarmStatus() {
-        sensor.setAlarmStatus();
+        delegate.setAlarmStatus();
     }
 
     @Override
     public void update() throws Exception {
-        int valueAddress = sensor.getModbusAddress() * 2 + 1;
+        int valueAddress = delegate.getModbusAddress() * 2 + 1;
 
         ReadInputRegistersRequest request = new ReadInputRegistersRequest(valueAddress, 1);
         ReadInputRegistersResponse response = client.readInputRegisters(slaveId, request);
@@ -132,8 +133,8 @@ public class SensorProxy implements Sensor, Updatable {
         byte[] bytes = response.registers();
         int rawValue = ByteBuffer.wrap(bytes).getShort() & 0xFFFF;
 
-        Object value = decodeValue(rawValue, sensor.getType());
-        sensor.setValue(value);
+        Object value = decodeValue(rawValue, delegate.getType());
+        delegate.setValue(value);
     }
 
     private Object decodeValue(int rawValue, SensorType type) {
@@ -163,61 +164,66 @@ public class SensorProxy implements Sensor, Updatable {
 
     @Override
     public SensorType getType() {
-        return sensor.getType();
+        return delegate.getType();
     }
 
     @Override
     public Object getValue() {
-        return sensor.getValue();
+        return delegate.getValue();
     }
 
     @Override
     public boolean isEnabled() {
-        return sensor.isEnabled();
+        return delegate.isEnabled();
     }
 
     @Override
     public StringProperty nameProperty() {
-        return sensor.nameProperty();
+        return delegate.nameProperty();
     }
 
     @Override
     public void resetToDefault() {
-        sensor.resetToDefault();
+        delegate.resetToDefault();
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-        sensor.setEnabled(enabled);
+        delegate.setEnabled(enabled);
     }
 
     @Override
     public void setState(SensorState state) {
-        sensor.setState(state);
+        delegate.setState(state);
     }
 
     @Override
     public void setValue(Object value) {
-        sensor.setValue(value);
+        delegate.setValue(value);
     }
 
     @Override
     public StringProperty shortNameProperty() {
-        return sensor.shortNameProperty();
+        return delegate.shortNameProperty();
     }
 
     @Override
     public ReadOnlyObjectProperty<SensorState> stateProperty() {
-        return sensor.stateProperty();
+        return delegate.stateProperty();
     }
 
     @Override
     public void turnOff() {
-        sensor.turnOff();
+        delegate.turnOff();
     }
 
     @Override
     public void turnOn() {
-        sensor.turnOn();
+        delegate.turnOn();
+    }
+
+    @Override
+    protected String getDefaultValueDisplay() {
+        return "-";
     }
 }

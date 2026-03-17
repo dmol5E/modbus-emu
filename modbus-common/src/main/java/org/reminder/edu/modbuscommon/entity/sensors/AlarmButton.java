@@ -1,13 +1,16 @@
 package org.reminder.edu.modbuscommon.entity.sensors;
 
-import org.reminder.edu.modbuscommon.entity.AbstractSensor;
-import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.config.SensorConfig;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
-public class AlarmButton extends AbstractSensor {
+public class AlarmButton extends Sensor {
+
+    private boolean pressed;
 
     public AlarmButton() {
         super(SensorType.ALARM_BUTTON, "Тревожная кнопка", "ТК");
+        this.pressed = SensorConfig.AlarmButton.getDefaultValue();
     }
 
     @Override
@@ -18,21 +21,36 @@ public class AlarmButton extends AbstractSensor {
     @Override
     public void resetToDefault() {
         setEnabled(true);
-        setState(SensorState.NORMAL);
+        setState(org.reminder.edu.modbuscommon.entity.enums.SensorState.NORMAL);
+        this.pressed = SensorConfig.AlarmButton.getDefaultValue();
+        updateValueDisplay(getDefaultValueDisplay());
     }
 
     @Override
     public Object getValue() {
-        return null;
+        return pressed;
     }
 
     @Override
     public void setValue(Object value) {
+        if (value instanceof Boolean) {
+            this.pressed = (Boolean) value;
+        } else if (value instanceof Number) {
+            this.pressed = ((Number) value).intValue() != 0;
+        }
     }
 
     public void press() {
         if (isEnabled()) {
-            setState(SensorState.ALARM);
+            setState(org.reminder.edu.modbuscommon.entity.enums.SensorState.ALARM);
         }
+    }
+
+    public boolean isPressed() {
+        return pressed;
+    }
+
+    public void setPressed(boolean pressed) {
+        this.pressed = pressed;
     }
 }

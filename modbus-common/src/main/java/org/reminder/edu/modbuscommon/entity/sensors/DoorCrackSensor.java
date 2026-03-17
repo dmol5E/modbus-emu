@@ -1,16 +1,16 @@
 package org.reminder.edu.modbuscommon.entity.sensors;
 
-import org.reminder.edu.modbuscommon.entity.AbstractSensor;
-import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.config.SensorConfig;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
-public class DoorCrackSensor extends AbstractSensor {
+public class DoorCrackSensor extends Sensor {
 
     private boolean cracked;
 
     public DoorCrackSensor() {
         super(SensorType.DOOR_CRACK, "Датчик взлома двери", "ДВ");
-        this.cracked = false;
+        this.cracked = SensorConfig.DoorCrack.getDefaultValue();
     }
 
     @Override
@@ -21,9 +21,9 @@ public class DoorCrackSensor extends AbstractSensor {
     @Override
     public void resetToDefault() {
         setEnabled(true);
-        setState(SensorState.NORMAL);
-        this.cracked = false;
-        updateValueDisplay();
+        setState(org.reminder.edu.modbuscommon.entity.enums.SensorState.NORMAL);
+        this.cracked = SensorConfig.DoorCrack.getDefaultValue();
+        updateValueDisplay(getDefaultValueDisplay());
     }
 
     @Override
@@ -35,28 +35,8 @@ public class DoorCrackSensor extends AbstractSensor {
     public void setValue(Object value) {
         if (value instanceof Boolean) {
             this.cracked = (Boolean) value;
-            updateValueDisplay();
-            updateState();
         } else if (value instanceof Number) {
             this.cracked = ((Number) value).intValue() != 0;
-            updateValueDisplay();
-            updateState();
-        }
-    }
-
-    private void updateValueDisplay() {
-        updateValueDisplay(cracked ? "Открыто" : "Закрыто");
-    }
-
-    private void updateState() {
-        if (!isEnabled()) {
-            return;
-        }
-
-        if (cracked) {
-            setState(SensorState.ALARM);
-        } else {
-            setState(SensorState.NORMAL);
         }
     }
 
@@ -66,7 +46,5 @@ public class DoorCrackSensor extends AbstractSensor {
 
     public void setCracked(boolean cracked) {
         this.cracked = cracked;
-        updateValueDisplay();
-        updateState();
     }
 }

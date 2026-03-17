@@ -1,16 +1,16 @@
 package org.reminder.edu.modbuscommon.entity.sensors;
 
-import org.reminder.edu.modbuscommon.entity.AbstractSensor;
-import org.reminder.edu.modbuscommon.entity.enums.SensorState;
+import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.config.SensorConfig;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
-public class GlassBreakSensor extends AbstractSensor {
+public class GlassBreakSensor extends Sensor {
 
     private boolean broken;
 
     public GlassBreakSensor() {
         super(SensorType.GLASS_BREAK, "Датчик разбития стекла", "ДС");
-        this.broken = false;
+        this.broken = SensorConfig.GlassBreak.getDefaultValue();
     }
 
     @Override
@@ -21,9 +21,9 @@ public class GlassBreakSensor extends AbstractSensor {
     @Override
     public void resetToDefault() {
         setEnabled(true);
-        setState(SensorState.NORMAL);
-        this.broken = false;
-        updateValueDisplay();
+        setState(org.reminder.edu.modbuscommon.entity.enums.SensorState.NORMAL);
+        this.broken = SensorConfig.GlassBreak.getDefaultValue();
+        updateValueDisplay(getDefaultValueDisplay());
     }
 
     @Override
@@ -35,28 +35,8 @@ public class GlassBreakSensor extends AbstractSensor {
     public void setValue(Object value) {
         if (value instanceof Boolean) {
             this.broken = (Boolean) value;
-            updateValueDisplay();
-            updateState();
         } else if (value instanceof Number) {
             this.broken = ((Number) value).intValue() != 0;
-            updateValueDisplay();
-            updateState();
-        }
-    }
-
-    private void updateValueDisplay() {
-        updateValueDisplay(broken ? "Разбито" : "Целое");
-    }
-
-    private void updateState() {
-        if (!isEnabled()) {
-            return;
-        }
-
-        if (broken) {
-            setState(SensorState.ALARM);
-        } else {
-            setState(SensorState.NORMAL);
         }
     }
 
@@ -66,7 +46,5 @@ public class GlassBreakSensor extends AbstractSensor {
 
     public void setBroken(boolean broken) {
         this.broken = broken;
-        updateValueDisplay();
-        updateState();
     }
 }
