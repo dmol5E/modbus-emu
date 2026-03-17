@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.reminder.edu.modbuscommon.Helper;
 import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.repository.SensorRepository;
+import org.reminder.edu.modbuscommon.entity.service.SensorBehaviorService;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +19,7 @@ import com.digitalpetri.modbus.client.ModbusRtuClient;
 import com.digitalpetri.modbus.serial.client.SerialPortClientTransport;
 import com.fazecast.jSerialComm.SerialPort;
 
-public class MasterModel {
+public class MasterModel implements SensorRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterModel.class);
 
@@ -30,6 +33,8 @@ public class MasterModel {
     private String stopBits;
 
     private final Collection<SensorProxy> sensors;
+    private final SensorBehaviorService sensorService;
+    private final Map<Integer, Sensor> sensorByAddress = new HashMap<>();
 
     private static final Map<String, Integer> PARITY_MAPPING = new HashMap<>();
 
@@ -42,9 +47,11 @@ public class MasterModel {
 
     public MasterModel() {
         List<Sensor> originSensors = Helper.createSensorsFromConfiguration();
+        this.sensorService = new SensorBehaviorService(this);
         sensors = new LinkedList<>();
         for (Sensor sensor : originSensors) {
-            sensors.add(new SensorProxy(sensor));
+            sensorByAddress.put(sensor.getModbusAddress(), sensor);
+            sensors.add(new SensorProxy(sensor, sensorService));
         }
     }
 
@@ -155,5 +162,27 @@ public class MasterModel {
 
     public void setStopBits(String stopBits) {
         this.stopBits = stopBits;
+    }
+
+    @Override
+    public List<Sensor> getAllSensors() {
+        return new LinkedList<>(sensorByAddress.values());
+    }
+
+    @Override
+    public java.util.Optional<Sensor> getSensor(int modbusAddress) {
+        return java.util.Optional.ofNullable(sensorByAddress.get(modbusAddress));
+    }
+
+    @Override
+    public void saveSensor(Sensor sensor) {
+        sensorByAddress.put(sensor.getModbusAddress(), sensor);
+    }
+
+    @Override
+    public List<Sensor> getSensorsByType(SensorType type) {
+        return sensorByAddress.values().stream()
+            .filter(s -> s.getType() == type)
+            .toList();
     }
 }

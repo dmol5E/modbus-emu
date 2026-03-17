@@ -1,21 +1,25 @@
 package org.reminder.edu.modbusslave;
 
-import com.digitalpetri.modbus.serial.server.SerialPortServerTransport;
-import com.digitalpetri.modbus.server.ModbusRtuServer;
-import com.digitalpetri.modbus.server.ReadWriteModbusServices;
-import com.fazecast.jSerialComm.SerialPort;
-import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+
 import org.reminder.edu.configuration.ApplicationConfiguration;
 import org.reminder.edu.modbuscommon.Helper;
 import org.reminder.edu.modbuscommon.entity.Sensor;
+import org.reminder.edu.modbuscommon.entity.repository.SensorRepository;
+import org.reminder.edu.modbuscommon.entity.service.SensorBehaviorService;
 import org.reminder.edu.modbusslave.comm.ModbusProcessImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.digitalpetri.modbus.serial.server.SerialPortServerTransport;
+import com.digitalpetri.modbus.server.ModbusRtuServer;
+import com.digitalpetri.modbus.server.ReadWriteModbusServices;
+import com.fazecast.jSerialComm.SerialPort;
+import com.google.inject.Inject;
 
 public final class ModBusSecondary {
 
@@ -23,6 +27,7 @@ public final class ModBusSecondary {
 
     private final List<Sensor> sensors;
     private final ModbusProcessImage modbusProcessImage;
+    private final SensorBehaviorService sensorService;
 
     private String portName;
     private int baudRate;
@@ -35,12 +40,13 @@ public final class ModBusSecondary {
     private ModbusRtuServer server;
 
     @Inject
-    public ModBusSecondary() {
-        this.modbusProcessImage = new ModbusProcessImage();
+    public ModBusSecondary(ModbusProcessImage modbusProcessImage, SensorBehaviorService sensorService, SensorRepository sensorRepository) {
+        this.modbusProcessImage = modbusProcessImage;
+        this.sensorService = sensorService;
         this.sensors = Helper.createSensorsFromConfiguration();
 
         for (Sensor sensor : sensors) {
-            modbusProcessImage.addSensor(sensor);
+            sensorRepository.saveSensor(sensor);
         }
 
         ApplicationConfiguration appConfig = ApplicationConfiguration.getInstance();
@@ -125,6 +131,10 @@ public final class ModBusSecondary {
 
     public ModbusProcessImage getModbusProcessImage() {
         return modbusProcessImage;
+    }
+
+    public SensorBehaviorService getSensorService() {
+        return sensorService;
     }
 
     public Set<String> getParityValues() {

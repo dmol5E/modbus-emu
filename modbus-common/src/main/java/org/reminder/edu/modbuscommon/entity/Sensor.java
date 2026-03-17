@@ -1,10 +1,5 @@
 package org.reminder.edu.modbuscommon.entity;
 
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 
@@ -14,20 +9,20 @@ public abstract class Sensor {
 
     private final int id;
     private final SensorType type;
-    private final StringProperty name;
-    private final StringProperty shortName;
-    private final StringProperty valueDisplay;
-    private final ReadOnlyObjectWrapper<SensorState> state;
+    private String name;
+    private String shortName;
+    private String valueDisplay;
+    private SensorState state;
     private boolean enabled;
     private int modbusAddress;
 
     protected Sensor(SensorType type, String baseName, String baseShortName) {
         this.id = ++idCounter;
         this.type = type;
-        this.name = new SimpleStringProperty(baseName + " " + id);
-        this.shortName = new SimpleStringProperty(baseShortName + id);
-        this.state = new ReadOnlyObjectWrapper<>(SensorState.NORMAL);
-        this.valueDisplay = new SimpleStringProperty(getDefaultValueDisplay());
+        this.name = baseName + " " + id;
+        this.shortName = baseShortName + id;
+        this.state = SensorState.NORMAL;
+        this.valueDisplay = getDefaultValueDisplay();
         this.enabled = true;
         this.modbusAddress = id - 1;
     }
@@ -41,19 +36,19 @@ public abstract class Sensor {
     }
 
     public String getName() {
-        return name.get();
-    }
-
-    public StringProperty nameProperty() {
         return name;
     }
 
-    public String getShortName() {
-        return shortName.get();
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public StringProperty shortNameProperty() {
+    public String getShortName() {
         return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public boolean isEnabled() {
@@ -65,11 +60,11 @@ public abstract class Sensor {
     }
 
     public SensorState getState() {
-        return state.get();
+        return state;
     }
 
     public void setState(SensorState state) {
-        this.state.set(state);
+        this.state = state;
     }
 
     public void setState(int stateCode) {
@@ -126,10 +121,6 @@ public abstract class Sensor {
         setState(SensorState.FAULT);
     }
 
-    public ReadOnlyObjectProperty<SensorState> stateProperty() {
-        return state.getReadOnlyProperty();
-    }
-
     public int getModbusAddress() {
         return modbusAddress;
     }
@@ -138,12 +129,12 @@ public abstract class Sensor {
         this.modbusAddress = address;
     }
 
-    public ReadOnlyStringProperty valueDisplayProperty() {
+    public String getValueDisplay() {
         return valueDisplay;
     }
 
     protected void updateValueDisplay(String display) {
-        this.valueDisplay.set(display);
+        this.valueDisplay = display;
     }
 
     protected abstract String getDefaultValueDisplay();

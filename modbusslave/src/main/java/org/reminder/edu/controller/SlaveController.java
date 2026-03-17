@@ -1,13 +1,17 @@
 package org.reminder.edu.controller;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
-import org.reminder.edu.modbusslave.ModBusSecondary;
 import org.reminder.edu.modbuscommon.entity.Sensor;
 import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.service.SensorBehaviorService;
+import org.reminder.edu.modbusslave.ModBusSecondary;
 import org.reminder.edu.modbusslave.logging.LogAppenderManager;
+import org.reminder.edu.modbusslave.viewmodel.SensorViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,45 +59,51 @@ public class SlaveController implements Initializable {
     private Button btnClose;
 
     @FXML
-    private TableView<Sensor> sensorsTable;
+    private TableView<SensorViewModel> sensorsTable;
 
     @FXML
-    private TableColumn<Sensor, Integer> sensorIdCol;
+    private TableColumn<SensorViewModel, Integer> sensorIdCol;
 
     @FXML
-    private TableColumn<Sensor, SensorType> sensorTypeCol;
+    private TableColumn<SensorViewModel, SensorType> sensorTypeCol;
 
     @FXML
-    private TableColumn<Sensor, String> sensorNameCol;
+    private TableColumn<SensorViewModel, String> sensorNameCol;
 
     @FXML
-    private TableColumn<Sensor, Integer> sensorAddressCol;
+    private TableColumn<SensorViewModel, Integer> sensorAddressCol;
 
     @FXML
-    private TableColumn<Sensor, Boolean> sensorEnabledCol;
+    private TableColumn<SensorViewModel, Boolean> sensorEnabledCol;
 
     @FXML
-    private TableColumn<Sensor, SensorState> sensorStateCol;
+    private TableColumn<SensorViewModel, SensorState> sensorStateCol;
 
     @FXML
-    private TableColumn<Sensor, String> sensorValueCol;
+    private TableColumn<SensorViewModel, String> sensorValueCol;
 
     @FXML
-    private TableColumn<Sensor, Void> sensorActionsCol;
+    private TableColumn<SensorViewModel, Void> sensorActionsCol;
 
     @FXML
     private TextArea logArea;
 
     private final ModBusSecondary model;
+    private final SensorBehaviorService sensorService;
 
     @Inject
     public SlaveController(ModBusSecondary manager) {
         this.model = manager;
+        this.sensorService = manager.getSensorService();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        sensorsTable.getItems().addAll(model.getSensors());
+        List<SensorViewModel> viewModels = new ArrayList<>();
+        for (Sensor sensor : model.getSensors()) {
+            viewModels.add(new SensorViewModel(sensor, sensorService));
+        }
+        sensorsTable.getItems().addAll(viewModels);
 
         final ObservableList<String> parityItems = parity.getItems();
         parityItems.addAll(model.getParityValues());
@@ -143,7 +153,7 @@ public class SlaveController implements Initializable {
         sensorAddressCol.setCellValueFactory(new PropertyValueFactory<>("modbusAddress"));
 
         sensorEnabledCol.setCellValueFactory(new PropertyValueFactory<>("enabled"));
-        sensorEnabledCol.setCellFactory(column -> new TableCell<Sensor, Boolean>() {
+        sensorEnabledCol.setCellFactory(column -> new TableCell<SensorViewModel, Boolean>() {
             private final CheckBox checkBox = new CheckBox();
 
             @Override
@@ -154,9 +164,9 @@ public class SlaveController implements Initializable {
                 } else {
                     checkBox.setSelected(item);
                     checkBox.setOnAction(e -> {
-                        Sensor sensor = getTableView().getItems().get(getIndex());
-                        sensor.setEnabled(checkBox.isSelected());
-                        logger.info("Sensor {} enabled: {}", sensor.getName(), checkBox.isSelected());
+                        SensorViewModel viewModel = getTableView().getItems().get(getIndex());
+                        sensorService.setEnabled(viewModel.getSensor(), checkBox.isSelected());
+                        logger.info("Sensor {} enabled: {}", viewModel.getName(), checkBox.isSelected());
                     });
                     setGraphic(checkBox);
                 }
@@ -170,11 +180,11 @@ public class SlaveController implements Initializable {
         sensorActionsCol.setCellFactory(createActionButtonCellFactory());
     }
 
-    private Callback<TableColumn<Sensor, Void>, TableCell<Sensor, Void>> createActionButtonCellFactory() {
-        return new Callback<TableColumn<Sensor, Void>, TableCell<Sensor, Void>>() {
+    private Callback<TableColumn<SensorViewModel, Void>, TableCell<SensorViewModel, Void>> createActionButtonCellFactory() {
+        return new Callback<TableColumn<SensorViewModel, Void>, TableCell<SensorViewModel, Void>>() {
             @Override
-            public TableCell<Sensor, Void> call(TableColumn<Sensor, Void> param) {
-                return new TableCell<Sensor, Void>() {
+            public TableCell<SensorViewModel, Void> call(TableColumn<SensorViewModel, Void> param) {
+                return new TableCell<SensorViewModel, Void>() {
                     private final Button resetBtn = new Button("Сброс");
                     private final Button alarmBtn = new Button("Тревога");
                     private final Button faultBtn = new Button("Сбой");
@@ -182,19 +192,19 @@ public class SlaveController implements Initializable {
 
                     {
                         resetBtn.setOnAction(e -> {
-                            Sensor sensor = getTableView().getItems().get(getIndex());
-                            sensor.resetToDefault();
-                            logger.info("Sensor {} reset to default", sensor.getName());
+                            SensorViewModel viewModel = getTableView().getItems().get(getIndex());
+                            sensorService.resetToDefault(viewModel.getSensor());
+                            logger.info("Sensor {} reset to default", viewModel.getName());
                         });
                         alarmBtn.setOnAction(e -> {
-                            Sensor sensor = getTableView().getItems().get(getIndex());
-                            sensor.setState(SensorState.ALARM);
-                            logger.info("Sensor {} set to ALARM", sensor.getName());
+                            SensorViewModel viewModel = getTableView().getItems().get(getIndex());
+                            viewModel.getSensor().setState(SensorState.ALARM);
+                            logger.info("Sensor {} set to ALARM", viewModel.getName());
                         });
                         faultBtn.setOnAction(e -> {
-                            Sensor sensor = getTableView().getItems().get(getIndex());
-                            sensor.setState(SensorState.FAULT);
-                            logger.info("Sensor {} set to FAULT", sensor.getName());
+                            SensorViewModel viewModel = getTableView().getItems().get(getIndex());
+                            viewModel.getSensor().setState(SensorState.FAULT);
+                            logger.info("Sensor {} set to FAULT", viewModel.getName());
                         });
                     }
 

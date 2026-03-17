@@ -13,11 +13,5 @@
     <name>modbus-common</name>
     
     <dependencies>
-        <!-- JavaFX for properties support -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>22.0.1</version>
-        </dependency>
     </dependencies>
 </project>

@@ -1,12 +1,17 @@
 package org.reminder.edu.modbuscommon.entity.service;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.reminder.edu.modbuscommon.entity.Sensor;
 import org.reminder.edu.modbuscommon.entity.config.SensorConfig;
+import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
+import org.reminder.edu.modbuscommon.entity.listener.SensorUpdateListener;
+import org.reminder.edu.modbuscommon.entity.repository.SensorRepository;
 import org.reminder.edu.modbuscommon.entity.sensors.AlarmButton;
 import org.reminder.edu.modbuscommon.entity.sensors.DoorCrackSensor;
 import org.reminder.edu.modbuscommon.entity.sensors.FireButton;
@@ -18,8 +23,11 @@ import org.reminder.edu.modbuscommon.entity.sensors.ThermalSensor;
 public class SensorBehaviorService {
 
     private final Map<SensorType, SensorBehaviorStrategy> strategies = new EnumMap<>(SensorType.class);
+    private final Map<Sensor, List<SensorUpdateListener>> listeners = new java.util.HashMap<>();
+    private final SensorRepository repository;
 
-    public SensorBehaviorService() {
+    public SensorBehaviorService(SensorRepository repository) {
+        this.repository = repository;
         registerStrategies();
     }
 
@@ -92,8 +100,10 @@ public class SensorBehaviorService {
     public void setValue(Sensor sensor, Object value) {
         SensorBehaviorStrategy strategy = getStrategy(sensor.getType());
         strategy.validate(value);
+        Object oldValue = sensor.getValue();
         sensor.setValue(value);
         strategy.updateState(sensor);
+        notifyValueChanged(sensor, oldValue, value);
     }
 
     public void updateState(Sensor sensor) {
@@ -101,17 +111,92 @@ public class SensorBehaviorService {
             return;
         }
         SensorBehaviorStrategy strategy = getStrategy(sensor.getType());
+        SensorState oldState = sensor.getState();
         strategy.updateState(sensor);
+        if (oldState != sensor.getState()) {
+            notifyStateChanged(sensor, oldState, sensor.getState());
+        }
     }
 
     public void resetToDefault(Sensor sensor) {
         SensorBehaviorStrategy strategy = getStrategy(sensor.getType());
+        SensorState oldState = sensor.getState();
+        boolean oldEnabled = sensor.isEnabled();
         strategy.resetToDefault(sensor);
+        if (oldState != sensor.getState()) {
+            notifyStateChanged(sensor, oldState, sensor.getState());
+        }
+        if (oldEnabled != sensor.isEnabled()) {
+            notifyEnabledChanged(sensor, oldEnabled, sensor.isEnabled());
+        }
+    }
+
+    public void setEnabled(Sensor sensor, boolean enabled) {
+        boolean oldEnabled = sensor.isEnabled();
+        if (oldEnabled != enabled) {
+            sensor.setEnabled(enabled);
+            notifyEnabledChanged(sensor, oldEnabled, enabled);
+        }
     }
 
     public String getValueDisplay(Sensor sensor) {
         SensorBehaviorStrategy strategy = getStrategy(sensor.getType());
         return strategy.getValueDisplay(sensor);
+    }
+
+    public List<Sensor> getAllSensors() {
+        return repository.getAllSensors();
+    }
+
+    public Optional<Sensor> getSensorByAddress(int address) {
+        return repository.getSensor(address);
+    }
+
+    public void subscribe(Sensor sensor, SensorUpdateListener listener) {
+        if (!listeners.containsKey(sensor)) {
+            listeners.put(sensor, new ArrayList<>());
+        }
+        List<SensorUpdateListener> sensorListeners = listeners.get(sensor);
+        if (!sensorListeners.contains(listener)) {
+            sensorListeners.add(listener);
+        }
+    }
+
+    public void unsubscribe(Sensor sensor, SensorUpdateListener listener) {
+        List<SensorUpdateListener> sensorListeners = listeners.get(sensor);
+        if (sensorListeners != null) {
+            sensorListeners.remove(listener);
+            if (sensorListeners.isEmpty()) {
+                listeners.remove(sensor);
+            }
+        }
+    }
+
+    private void notifyValueChanged(Sensor sensor, Object oldValue, Object newValue) {
+        List<SensorUpdateListener> sensorListeners = listeners.get(sensor);
+        if (sensorListeners != null) {
+            for (SensorUpdateListener listener : sensorListeners) {
+                listener.onValueChanged(sensor, newValue);
+            }
+        }
+    }
+
+    private void notifyStateChanged(Sensor sensor, SensorState oldState, SensorState newState) {
+        List<SensorUpdateListener> sensorListeners = listeners.get(sensor);
+        if (sensorListeners != null) {
+            for (SensorUpdateListener listener : sensorListeners) {
+                listener.onStateChanged(sensor, newState);
+            }
+        }
+    }
+
+    private void notifyEnabledChanged(Sensor sensor, boolean oldEnabled, boolean newEnabled) {
+        List<SensorUpdateListener> sensorListeners = listeners.get(sensor);
+        if (sensorListeners != null) {
+            for (SensorUpdateListener listener : sensorListeners) {
+                listener.onEnabledChanged(sensor, newEnabled);
+            }
+        }
     }
 
     private SensorBehaviorStrategy getStrategy(SensorType type) {
