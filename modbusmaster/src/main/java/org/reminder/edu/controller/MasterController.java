@@ -247,6 +247,17 @@ public class MasterController implements Initializable {
         }
     }
 
+    public void cleanup() {
+        try {
+            if (model.isOpenConnection()) {
+                model.closeConnection();
+                logger.info("Connection closed on exit");
+            }
+        } catch (Exception e) {
+            logger.error("Error closing connection on exit", e);
+        }
+    }
+
     @FXML
     private void handleSensorStateRequest(ActionEvent event) {
         if (!model.isOpenConnection()) {

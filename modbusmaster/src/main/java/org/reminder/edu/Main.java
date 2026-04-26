@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.reminder.edu.controller.MasterController;
 
 public class Main extends Application {
 
@@ -26,11 +27,20 @@ public class Main extends Application {
 
         Parent root = loader.load();
 
+        MasterController controller = loader.getController();
+
         Scene scene = new Scene(root);
 
         primaryStage.setTitle("ModBus Master");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
+
+        primaryStage.setOnCloseRequest(event -> {
+            if (controller != null) {
+                controller.cleanup();
+            }
+        });
+
         primaryStage.show();
     }
 }

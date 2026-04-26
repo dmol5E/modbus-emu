@@ -245,6 +245,12 @@ public class SlaveController implements Initializable {
     }
 
     public void cleanup() {
+        try {
+            model.stopModbusListener();
+            logger.info("Modbus connection closed on exit");
+        } catch (Exception e) {
+            logger.error("Error closing Modbus connection on exit", e);
+        }
         LogAppenderManager.unregisterTextArea();
     }
 }
