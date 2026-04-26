@@ -16,7 +16,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -153,18 +152,19 @@ public class MasterController implements Initializable {
 
         card.getChildren().addAll(shortNameLabel, typeLabel, valueLabel, nameLabel, addrLabel);
 
-        Runnable updateStyle = () -> Platform.runLater(() -> {
-            card.getStyleClass().removeAll("state-normal", "state-alarm", "state-fault", "state-disabled");
-            if (!proxy.isEnabled()) {
-                card.getStyleClass().add("state-disabled");
-            } else {
-                switch (proxy.getState()) {
-                    case NORMAL -> card.getStyleClass().add("state-normal");
-                    case ALARM -> card.getStyleClass().add("state-alarm");
-                    case FAULT -> card.getStyleClass().add("state-fault");
+        Runnable updateStyle = () ->
+            Platform.runLater(() -> {
+                card.getStyleClass().removeAll("state-normal", "state-alarm", "state-fault", "state-disabled");
+                if (!proxy.isEnabled()) {
+                    card.getStyleClass().add("state-disabled");
+                } else {
+                    switch (proxy.getState()) {
+                        case NORMAL -> card.getStyleClass().add("state-normal");
+                        case ALARM -> card.getStyleClass().add("state-alarm");
+                        case FAULT -> card.getStyleClass().add("state-fault");
+                    }
                 }
-            }
-        });
+            });
 
         proxy.stateProperty().addListener((obs, old, val) -> updateStyle.run());
         proxy.enabledProperty().addListener((obs, old, val) -> updateStyle.run());
@@ -262,8 +262,16 @@ public class MasterController implements Initializable {
                 String newValue = sensor.getValueDisplay();
 
                 if (prevState != null && prevState != newState) {
-                    logEvent(sensor.getName() + ": " + stateDisplay(prevState) + " → " + stateDisplay(newState)
-                             + " (" + newValue + ")");
+                    logEvent(
+                        sensor.getName() +
+                            ": " +
+                            stateDisplay(prevState) +
+                            " → " +
+                            stateDisplay(newState) +
+                            " (" +
+                            newValue +
+                            ")"
+                    );
                 } else if (prevValue != null && !prevValue.equals(newValue) && prevState == newState) {
                     logEvent(sensor.getName() + ": значение изменено " + prevValue + " → " + newValue);
                 }
