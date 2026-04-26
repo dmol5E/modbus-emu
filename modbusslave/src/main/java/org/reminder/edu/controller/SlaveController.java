@@ -198,12 +198,12 @@ public class SlaveController implements Initializable {
                         });
                         alarmBtn.setOnAction(e -> {
                             SensorViewModel viewModel = getTableView().getItems().get(getIndex());
-                            viewModel.getSensor().setState(SensorState.ALARM);
+                            sensorService.forceState(viewModel.getSensor(), SensorState.ALARM);
                             logger.info("Sensor {} set to ALARM", viewModel.getName());
                         });
                         faultBtn.setOnAction(e -> {
                             SensorViewModel viewModel = getTableView().getItems().get(getIndex());
-                            viewModel.getSensor().setState(SensorState.FAULT);
+                            sensorService.forceState(viewModel.getSensor(), SensorState.FAULT);
                             logger.info("Sensor {} set to FAULT", viewModel.getName());
                         });
                     }

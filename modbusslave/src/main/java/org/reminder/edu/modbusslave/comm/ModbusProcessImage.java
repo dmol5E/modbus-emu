@@ -70,6 +70,18 @@ public class ModbusProcessImage {
         updateSensorRegisters(sensor, statusRegisterAddress, valueRegisterAddress);
     }
 
+    public void updateSensorCoils(Sensor sensor) {
+        int sensorIndex = sensors.indexOf(sensor);
+        processImage.get(tx -> {
+            tx.writeCoils(map -> {
+                map.put(coilBaseAddress + sensorIndex * 4,     sensor.isEnabled());
+                map.put(coilBaseAddress + sensorIndex * 4 + 2, sensor.getState() == SensorState.ALARM);
+                map.put(coilBaseAddress + sensorIndex * 4 + 3, sensor.getState() == SensorState.FAULT);
+            });
+            return null;
+        });
+    }
+
     private void updateSensorRegisters(Sensor sensor, int statusAddress, int valueAddress) {
         int statusValue = encodeStatus(sensor);
         int valueValue = encodeValue(sensor);

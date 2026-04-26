@@ -19,6 +19,7 @@ public class ModbusSecondaryModule extends AbstractModule {
     }
 
     @Provides
+    @Singleton
     SensorBehaviorService providSensorBehaviorService(SensorRepository repository) {
         return new SensorBehaviorService(repository);
     }

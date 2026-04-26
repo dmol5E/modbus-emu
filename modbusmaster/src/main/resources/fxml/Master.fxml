@@ -151,9 +151,9 @@
                   <children>
                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                       <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
+                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ТД 1:" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
+                        <TextArea fx:id="td1Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
                       </children>
                       <GridPane.margin>
                         <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" fx:id="x1" />
@@ -161,51 +161,37 @@
                     </HBox>
                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="2">
                       <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
+                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ТД 2:" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
+                        <TextArea fx:id="td2Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
                       </children>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="3">
                       <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
+                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДД 3:" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
+                        <TextArea fx:id="dd3Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
                       </children>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="4">
                       <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
+                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДД 4:" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
+                        <TextArea fx:id="dd4Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
                       </children>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.margin="$x1" GridPane.rowIndex="1">
                       <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
+                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДВ 8:" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
+                        <TextArea fx:id="dv8Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
                       </children>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.margin="$x1" GridPane.rowIndex="2">
                       <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
+                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДВ 9:" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.margin="$x1" GridPane.rowIndex="3">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.margin="$x1" GridPane.rowIndex="4">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ИП 1:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea prefHeight="28.0" prefWidth="165.0" wrapText="true" />
+                        <TextArea fx:id="dv9Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
                       </children>
                     </HBox>
                   </children>
@@ -227,7 +213,7 @@
                 <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                   <children>
                     <Label opacity="0.13" prefHeight="45.0" prefWidth="160.0" text="Запросить состояние измерительных приборов" textAlignment="CENTER" wrapText="true" />
-                    <Button contentDisplay="BOTTOM" font="$x2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="102.0" text="Запрос" textAlignment="CENTER" />
+                    <Button onAction="#handleSensorStateRequest" contentDisplay="BOTTOM" font="$x2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="102.0" text="Запрос" textAlignment="CENTER" />
                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" />
                   </children>
                 </VBox>

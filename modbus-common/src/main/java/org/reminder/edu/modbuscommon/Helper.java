@@ -33,10 +33,6 @@ public class Helper {
             sensors.add(new SmokeSensor());
         }
 
-        for (int i = 0; i < PRESSURE_SENSOR_COUNT; i++) {
-            sensors.add(new PressureSensor());
-        }
-
         for (int i = 0; i < FIRE_BUTTON_COUNT; i++) {
             sensors.add(new FireButton());
         }
@@ -45,12 +41,16 @@ public class Helper {
             sensors.add(new AlarmButton());
         }
 
-        for (int i = 0; i < CRACK_DOOR_SENSOR_COUNT; i++) {
-            sensors.add(new DoorCrackSensor());
+        for (int i = 0; i < PRESSURE_SENSOR_COUNT; i++) {
+            sensors.add(new PressureSensor());
         }
 
         for (int i = 0; i < GLASS_BREAK_SENSOR_COUNT; i++) {
             sensors.add(new GlassBreakSensor());
+        }
+
+        for (int i = 0; i < CRACK_DOOR_SENSOR_COUNT; i++) {
+            sensors.add(new DoorCrackSensor());
         }
 
         return sensors;

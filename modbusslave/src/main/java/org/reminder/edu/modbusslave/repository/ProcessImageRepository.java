@@ -37,6 +37,12 @@ public class ProcessImageRepository implements SensorRepository {
     }
 
     @Override
+    public void updateSensor(Sensor sensor) {
+        processImage.updateSensorState(sensor);
+        processImage.updateSensorCoils(sensor);
+    }
+
+    @Override
     public List<Sensor> getSensorsByType(SensorType type) {
         return processImage.getSensors().stream()
             .filter(sensor -> sensor.getType() == type)

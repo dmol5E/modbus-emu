@@ -63,6 +63,33 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
 
     public void setButton(Button button) {
         this.button = button;
+        state.addListener((obs, old, newState) -> {
+            if (!enabled.get()) {
+                javafx.application.Platform.runLater(() ->
+                    button.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white;"));
+            } else {
+                updateButtonStyle(newState);
+            }
+        });
+        enabled.addListener((obs, old, isEnabled) -> {
+            if (!isEnabled) {
+                javafx.application.Platform.runLater(() ->
+                    button.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white;"));
+            } else {
+                updateButtonStyle(state.get());
+            }
+        });
+        updateButtonStyle(state.get());
+    }
+
+    private void updateButtonStyle(SensorState sensorState) {
+        if (button == null) return;
+        String style = switch (sensorState) {
+            case NORMAL -> "-fx-background-color: #4CAF50; -fx-text-fill: white;";
+            case ALARM  -> "-fx-background-color: #F44336; -fx-text-fill: white;";
+            case FAULT  -> "-fx-background-color: #FFC107; -fx-text-fill: black;";
+        };
+        javafx.application.Platform.runLater(() -> button.setStyle(style));
     }
 
     public Button getButton() {
@@ -151,16 +178,21 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
 
     @Override
     public void update() throws Exception {
-        int valueAddress = delegate.getModbusAddress() * 2 + 1;
+        int statusAddress = delegate.getModbusAddress() * 2;
+        int valueAddress  = delegate.getModbusAddress() * 2 + 1;
+        SensorType type   = delegate.getType();
 
-        ReadInputRegistersRequest request = new ReadInputRegistersRequest(valueAddress, 1);
-        ReadInputRegistersResponse response = client.readInputRegisters(slaveId, request);
-
-        byte[] bytes = response.registers();
-        int rawValue = ByteBuffer.wrap(bytes).getShort() & 0xFFFF;
-
-        Object value = decodeValue(rawValue, delegate.getType());
-        sensorService.setValue(delegate, value);
+        if (type == SensorType.FIRE_BUTTON || type == SensorType.ALARM_BUTTON) {
+            ReadInputRegistersRequest statusRequest = new ReadInputRegistersRequest(statusAddress, 1);
+            ReadInputRegistersResponse statusResponse = client.readInputRegisters(slaveId, statusRequest);
+            int statusRaw = ByteBuffer.wrap(statusResponse.registers()).getShort() & 0xFFFF;
+            sensorService.setValue(delegate, (statusRaw & 0x04) != 0);
+        } else {
+            ReadInputRegistersRequest request = new ReadInputRegistersRequest(valueAddress, 1);
+            ReadInputRegistersResponse response = client.readInputRegisters(slaveId, request);
+            int rawValue = ByteBuffer.wrap(response.registers()).getShort() & 0xFFFF;
+            sensorService.setValue(delegate, decodeValue(rawValue, type));
+        }
     }
 
     private Object decodeValue(int rawValue, SensorType type) {

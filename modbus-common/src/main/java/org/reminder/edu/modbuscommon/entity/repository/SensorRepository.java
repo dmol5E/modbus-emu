@@ -14,5 +14,7 @@ public interface SensorRepository {
 
     void saveSensor(Sensor sensor);
 
+    void updateSensor(Sensor sensor);
+
     List<Sensor> getSensorsByType(SensorType type);
 }

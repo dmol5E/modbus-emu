@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
 import org.reminder.edu.model.MasterModel;
 import org.slf4j.Logger;
@@ -99,6 +102,24 @@ public class MasterController implements Initializable {
     @FXML
     private TextArea logArea;
 
+    @FXML
+    private TextArea td1Value;
+
+    @FXML
+    private TextArea td2Value;
+
+    @FXML
+    private TextArea dd3Value;
+
+    @FXML
+    private TextArea dd4Value;
+
+    @FXML
+    private TextArea dv8Value;
+
+    @FXML
+    private TextArea dv9Value;
+
     private final MasterModel model;
 
     @Inject
@@ -108,12 +129,14 @@ public class MasterController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        slaveId.setText("1");
+
         final ObservableList<String> portNamesItems = portNames.getItems();
         SerialPort[] ports = SerialPort.getCommPorts();
         for (SerialPort serialPort : ports) {
             portNamesItems.add(serialPort.getSystemPortName());
         }
-        //portNamesItems.add("/tmp/ttyV1");
+        portNamesItems.add("/tmp/ttyV1");
 
         final ObservableList<Integer> dataBitsItems = dataBits.getItems();
         dataBitsItems.add(4);
@@ -171,6 +194,17 @@ public class MasterController implements Initializable {
                 proxies.next().setButton(button);
             }
         }
+
+        List<TextArea> valueAreas = List.of(td1Value, td2Value, dd3Value, dd4Value, dv8Value, dv9Value);
+        List<SensorProxy> numericProxies = model.getSensors().stream()
+            .filter(p -> p.getType() == SensorType.THERMAL ||
+                         p.getType() == SensorType.SMOKE ||
+                         p.getType() == SensorType.PRESSURE)
+            .collect(Collectors.toList());
+        for (int i = 0; i < Math.min(valueAreas.size(), numericProxies.size()); i++) {
+            valueAreas.get(i).setEditable(false);
+            valueAreas.get(i).textProperty().bind(numericProxies.get(i).valueDisplayProperty());
+        }
     }
 
     @FXML
@@ -218,14 +252,16 @@ public class MasterController implements Initializable {
             return;
         }
 
-        try {
-            for (SensorProxy sensor : model.getSensors()) {
+        int updated = 0;
+        Collection<SensorProxy> sensors = model.getSensors();
+        for (SensorProxy sensor : sensors) {
+            try {
                 sensor.update();
+                updated++;
+            } catch (Exception e) {
+                logger.error("Error updating sensor {}: {}", sensor.getName(), e.getMessage());
             }
-            logArea.appendText("Sensor states updated\n");
-        } catch (Exception e) {
-            logArea.appendText("Error updating sensors: " + e.getMessage() + "\n");
-            logger.error("Error updating sensors", e);
         }
+        logArea.appendText("Sensor states updated: " + updated + "/" + sensors.size() + "\n");
     }
 }

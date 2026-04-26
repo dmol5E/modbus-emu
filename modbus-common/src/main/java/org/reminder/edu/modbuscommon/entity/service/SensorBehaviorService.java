@@ -101,9 +101,14 @@ public class SensorBehaviorService {
         SensorBehaviorStrategy strategy = getStrategy(sensor.getType());
         strategy.validate(value);
         Object oldValue = sensor.getValue();
+        SensorState oldState = sensor.getState();
         sensor.setValue(value);
         strategy.updateState(sensor);
+        repository.updateSensor(sensor);
         notifyValueChanged(sensor, oldValue, value);
+        if (oldState != sensor.getState()) {
+            notifyStateChanged(sensor, oldState, sensor.getState());
+        }
     }
 
     public void updateState(Sensor sensor) {
@@ -114,6 +119,7 @@ public class SensorBehaviorService {
         SensorState oldState = sensor.getState();
         strategy.updateState(sensor);
         if (oldState != sensor.getState()) {
+            repository.updateSensor(sensor);
             notifyStateChanged(sensor, oldState, sensor.getState());
         }
     }
@@ -123,6 +129,7 @@ public class SensorBehaviorService {
         SensorState oldState = sensor.getState();
         boolean oldEnabled = sensor.isEnabled();
         strategy.resetToDefault(sensor);
+        repository.updateSensor(sensor);
         if (oldState != sensor.getState()) {
             notifyStateChanged(sensor, oldState, sensor.getState());
         }
@@ -135,7 +142,17 @@ public class SensorBehaviorService {
         boolean oldEnabled = sensor.isEnabled();
         if (oldEnabled != enabled) {
             sensor.setEnabled(enabled);
+            repository.updateSensor(sensor);
             notifyEnabledChanged(sensor, oldEnabled, enabled);
+        }
+    }
+
+    public void forceState(Sensor sensor, SensorState newState) {
+        SensorState oldState = sensor.getState();
+        if (oldState != newState) {
+            sensor.setState(newState);
+            repository.updateSensor(sensor);
+            notifyStateChanged(sensor, oldState, newState);
         }
     }
 
@@ -150,6 +167,16 @@ public class SensorBehaviorService {
 
     public Optional<Sensor> getSensorByAddress(int address) {
         return repository.getSensor(address);
+    }
+
+    public Sensor registerSensor(Sensor sensor, SensorUpdateListener listener) {
+        Optional<Sensor> existing = repository.getSensor(sensor.getModbusAddress());
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        repository.saveSensor(sensor);
+        subscribe(sensor, listener);
+        return sensor;
     }
 
     public void subscribe(Sensor sensor, SensorUpdateListener listener) {

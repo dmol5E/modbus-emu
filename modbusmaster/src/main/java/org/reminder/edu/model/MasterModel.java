@@ -180,6 +180,11 @@ public class MasterModel implements SensorRepository {
     }
 
     @Override
+    public void updateSensor(Sensor sensor) {
+        // In-memory store: sensor object is already updated by reference
+    }
+
+    @Override
     public List<Sensor> getSensorsByType(SensorType type) {
         return sensorByAddress.values().stream()
             .filter(s -> s.getType() == type)
