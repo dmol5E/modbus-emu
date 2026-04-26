@@ -1,30 +1,23 @@
 package org.reminder.edu.modbusmaster.entity;
 
+import com.digitalpetri.modbus.client.ModbusRtuClient;
+import com.digitalpetri.modbus.pdu.ReadInputRegistersRequest;
+import com.digitalpetri.modbus.pdu.ReadInputRegistersResponse;
+import com.digitalpetri.modbus.pdu.WriteSingleCoilRequest;
 import java.nio.ByteBuffer;
-
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.Button;
 import org.reminder.edu.Updatable;
 import org.reminder.edu.modbuscommon.entity.Sensor;
 import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 import org.reminder.edu.modbuscommon.entity.listener.SensorUpdateListener;
 import org.reminder.edu.modbuscommon.entity.service.SensorBehaviorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.digitalpetri.modbus.client.ModbusRtuClient;
-import com.digitalpetri.modbus.pdu.ReadInputRegistersRequest;
-import com.digitalpetri.modbus.pdu.ReadInputRegistersResponse;
-import com.digitalpetri.modbus.pdu.WriteSingleCoilRequest;
-
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.scene.control.Button;
 
 public class SensorProxy implements Updatable, SensorUpdateListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(SensorProxy.class);
 
     private final Sensor delegate;
     private final SensorBehaviorService sensorService;
@@ -66,7 +59,8 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
         state.addListener((obs, old, newState) -> {
             if (!enabled.get()) {
                 javafx.application.Platform.runLater(() ->
-                    button.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white;"));
+                    button.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white;")
+                );
             } else {
                 updateButtonStyle(newState);
             }
@@ -74,7 +68,8 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
         enabled.addListener((obs, old, isEnabled) -> {
             if (!isEnabled) {
                 javafx.application.Platform.runLater(() ->
-                    button.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white;"));
+                    button.setStyle("-fx-background-color: #9E9E9E; -fx-text-fill: white;")
+                );
             } else {
                 updateButtonStyle(state.get());
             }
@@ -86,8 +81,8 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
         if (button == null) return;
         String style = switch (sensorState) {
             case NORMAL -> "-fx-background-color: #4CAF50; -fx-text-fill: white;";
-            case ALARM  -> "-fx-background-color: #F44336; -fx-text-fill: white;";
-            case FAULT  -> "-fx-background-color: #FFC107; -fx-text-fill: black;";
+            case ALARM -> "-fx-background-color: #F44336; -fx-text-fill: white;";
+            case FAULT -> "-fx-background-color: #FFC107; -fx-text-fill: black;";
         };
         javafx.application.Platform.runLater(() -> button.setStyle(style));
     }
@@ -179,8 +174,8 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
     @Override
     public void update() throws Exception {
         int statusAddress = delegate.getModbusAddress() * 2;
-        int valueAddress  = delegate.getModbusAddress() * 2 + 1;
-        SensorType type   = delegate.getType();
+        int valueAddress = delegate.getModbusAddress() * 2 + 1;
+        SensorType type = delegate.getType();
 
         ReadInputRegistersRequest statusRequest = new ReadInputRegistersRequest(statusAddress, 1);
         ReadInputRegistersResponse statusResponse = client.readInputRegisters(slaveId, statusRequest);
@@ -242,8 +237,7 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
     }
 
     @Override
-    public void commit() {
-    }
+    public void commit() {}
 
     public SensorType getType() {
         return delegate.getType();

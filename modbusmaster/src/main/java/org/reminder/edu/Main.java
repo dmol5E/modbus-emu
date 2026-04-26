@@ -1,16 +1,14 @@
 package org.reminder.edu;
 
-import org.reminder.edu.modbusmaster.config.ModbusMasterModule;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.reminder.edu.controller.MasterController;
+import org.reminder.edu.modbusmaster.config.ModbusMasterModule;
 
 public class Main extends Application {
 

@@ -4,250 +4,49 @@
 <?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 
-<GridPane alignment="BASELINE_CENTER" blendMode="SRC_OVER" cache="false" gridLinesVisible="false" hgap="0.0" maxHeight="-Infinity" maxWidth="722.0" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="true" prefHeight="-1.0" prefWidth="-1.0" rotate="0.0" snapToPixel="false" vgap="0.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="org.reminder.edu.controller.MasterController">
-  <children>
-    <TabPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="221.0" prefWidth="722.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1.7976931348623157E308" GridPane.columnIndex="0" GridPane.rowIndex="0">
-      <tabs>
-        <Tab text="Параметры интерфейса">
-          <content>
-            <VBox prefHeight="200.0">
-              <HBox prefHeight="30.0" prefWidth="722.0" />
-              <HBox>
-                <GridPane alignment="CENTER" hgap="5.0" prefHeight="93.0" prefWidth="191.0" styleClass="configPane" vgap="5.0">
-                  <children>
-                    <Label text="Адрес Slave:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <TextField fx:id="slaveId" prefWidth="150.0" GridPane.columnIndex="1" />
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints maxWidth="73.0" prefWidth="71.0" />
-                    <ColumnConstraints maxWidth="142.0" prefWidth="95.0" />
-                  </columnConstraints>
-                  <padding>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                  </padding>
-                  <rowConstraints>
-                    <RowConstraints />
-                  </rowConstraints>
-                </GridPane>
-                <GridPane hgap="5.0" prefWidth="517.0" styleClass="configPane" vgap="5.0">
-                  <children>
-                    <Label text="Порт:" textAlignment="LEFT" GridPane.halignment="RIGHT" />
-                    <ComboBox fx:id="portNames" prefWidth="150.0" GridPane.columnIndex="1" />
-                    <Label text="Скорость (бит/с):" textAlignment="LEFT" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                    <ComboBox fx:id="baudRate" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <Label text="Четность:" textAlignment="LEFT" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="parity" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <Label text="Биты данных:" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
-                    <ComboBox fx:id="dataBits" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-                    <Label text="Стоповые биты:" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                    <ComboBox fx:id="stopBits" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                    <Label text="Управление потоком:" textAlignment="LEFT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="flowControl" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints maxWidth="101.0" prefWidth="97.0" />
-                    <ColumnConstraints maxWidth="147.0" prefWidth="113.0" />
-                    <ColumnConstraints maxWidth="151.0" prefWidth="145.0" />
-                    <ColumnConstraints maxWidth="149.0" prefWidth="118.0" />
-                  </columnConstraints>
-                  <padding>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                  </padding>
-                  <rowConstraints>
-                    <RowConstraints maxHeight="21.0" prefHeight="21.0" />
-                    <RowConstraints maxHeight="21.0" prefHeight="21.0" />
-                    <RowConstraints maxHeight="21.0" prefHeight="21.0" />
-                  </rowConstraints>
-                </GridPane>
-              </HBox>
-              <HBox alignment="BASELINE_RIGHT" prefHeight="30.0" prefWidth="722.0" styleClass="configPane">
-                <Button onAction="#handleOpenConnection" text="Открыть" />
-                <Text opacity="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="false" wrappingWidth="5.0" />
-                <Button onAction="#handleCloseConnection" text="Закрыть" />
-                <Text opacity="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" visible="false" wrappingWidth="32.0" />
-                <padding>
-                  <Insets top="5.0" />
-                </padding>
-              </HBox>
-            </VBox>
-          </content>
-        </Tab>
-        <Tab text="Состояние датчиков">
-          <content>
-            <GridPane>
-              <children>
-                <GridPane hgap="0.0" prefHeight="190.0" prefWidth="578.0" vgap="0.0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.rowIndex="0" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
-                  <children>
-                    <Button fx:id="td1" disable="false" graphicTextGap="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0"  text="ТД 1" textAlignment="CENTER" textOverrun="CLIP" visible="true" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                    <Button fx:id="tk6" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ТК 6" textAlignment="CENTER" visible="true" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                    <Button fx:id="ds11" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДС 11" textAlignment="CENTER" visible="true" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                    <Button fx:id="td2" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text=" ТД 2" textAlignment="CENTER" visible="true" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                    <Button fx:id="tk7" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ТК 7" textAlignment="CENTER" visible="true" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                    <Button fx:id="ds12" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДС 12" textAlignment="CENTER" visible="true" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                    <Button fx:id="dd3" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДД 3" textAlignment="CENTER" visible="true" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                    <Button fx:id="dd4" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДД 4" textAlignment="CENTER" visible="true" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                    <Button fx:id="dv8" cancelButton="false" contentDisplay="LEFT" defaultButton="false" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДВ 8" textAlignment="CENTER" underline="false" visible="true" wrapText="false" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                    <Button fx:id="do14" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДО 14" textAlignment="CENTER" visible="true" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP">
-                      <GridPane.margin>
-                        <Insets />
-                      </GridPane.margin>
-                    </Button>
-                    <Button fx:id="pk5" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ПК 5" textAlignment="CENTER" visible="true" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                    <Button fx:id="dv9" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДВ 9" textAlignment="CENTER" visible="true" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                    <Button fx:id="do13" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДО 13" textAlignment="CENTER" visible="true" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                    <Button fx:id="ds10" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДС 10" textAlignment="CENTER" visible="true" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-                    <Button fx:id="do15" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="60.0" text="ДО 15" textAlignment="CENTER" visible="true" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                    <RowConstraints maxHeight="20.0" minHeight="11.0" prefHeight="11.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="68.0" minHeight="60.0" prefHeight="63.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="66.0" minHeight="60.0" prefHeight="63.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="53.0" minHeight="50.0" prefHeight="53.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                </GridPane>
-                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                  <children>
-                    <Label opacity="0.13" prefHeight="45.0" prefWidth="134.0" text="Запросить состояние датчиков" textAlignment="CENTER" wrapText="true" />
-                    <Button onAction="#handleSensorStateRequest" contentDisplay="BOTTOM" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="102.0" text="Запрос" textAlignment="CENTER">
-                      <font>
-                        <Font size="14.0" fx:id="x2" />
-                      </font>
-                    </Button>
-                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" />
-                  </children>
-                </VBox>
-              </children>
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="591.0" minWidth="10.0" prefWidth="530.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-            </GridPane>
-          </content>
-        </Tab>
-        <Tab text="Величина измерений">
-          <content>
-            <GridPane>
-              <children>
-                <GridPane GridPane.columnIndex="0" GridPane.rowIndex="0">
-                  <children>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ТД 1:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea fx:id="td1Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                      <GridPane.margin>
-                        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" fx:id="x1" />
-                      </GridPane.margin>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="2">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ТД 2:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea fx:id="td2Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="3">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДД 3:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea fx:id="dd3Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="4">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДД 4:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea fx:id="dd4Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.margin="$x1" GridPane.rowIndex="1">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДВ 8:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea fx:id="dv8Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.margin="$x1" GridPane.rowIndex="2">
-                      <children>
-                        <Label alignment="CENTER_LEFT" contentDisplay="TOP" text="ДВ 9:" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="10.0" />
-                        <TextArea fx:id="dv9Value" prefHeight="28.0" prefWidth="165.0" wrapText="true" />
-                      </children>
-                    </HBox>
-                  </children>
-                  <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="34.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="232.0" minWidth="10.0" prefWidth="232.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="238.0" minWidth="10.0" prefWidth="227.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="132.0" minWidth="10.0" prefWidth="37.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                    <RowConstraints maxHeight="15.0" minHeight="15.0" prefHeight="15.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="15.0" minHeight="15.0" prefHeight="15.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                </GridPane>
-                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                  <children>
-                    <Label opacity="0.13" prefHeight="45.0" prefWidth="160.0" text="Запросить состояние измерительных приборов" textAlignment="CENTER" wrapText="true" />
-                    <Button onAction="#handleSensorStateRequest" contentDisplay="BOTTOM" font="$x2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="102.0" text="Запрос" textAlignment="CENTER" />
-                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="" />
-                  </children>
-                </VBox>
-              </children>
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="591.0" minWidth="10.0" prefWidth="505.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-            </GridPane>
-          </content>
-        </Tab>
-      </tabs>
-    </TabPane>
-    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="722.0" vbarPolicy="AS_NEEDED" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-      <content>
-        <TextArea fx:id="logArea" maxHeight="1.7976931348623157E308" maxWidth="720.0" minHeight="50.0" minWidth="-Infinity" prefHeight="198.0" prefWidth="720.0" wrapText="true" />
-      </content>
-    </ScrollPane>
-  </children>
-  <columnConstraints>
-    <ColumnConstraints />
-    <ColumnConstraints percentWidth="0.0" />
-  </columnConstraints>
-  <padding>
-    <Insets />
-  </padding>
-  <rowConstraints>
-    <RowConstraints />
-    <RowConstraints />
-  </rowConstraints>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17"
+            fx:controller="org.reminder.edu.controller.MasterController">
+  <top>
+    <HBox spacing="5.0" alignment="CENTER_LEFT" styleClass="configPane">
+      <padding>
+        <Insets top="5.0" right="10.0" bottom="5.0" left="10.0"/>
+      </padding>
+      <Label text="Порт:"/>
+      <ComboBox fx:id="portNames" prefWidth="120.0"/>
+      <Label text="Скорость:"/>
+      <ComboBox fx:id="baudRate" prefWidth="90.0"/>
+      <Label text="Биты:"/>
+      <ComboBox fx:id="dataBits" prefWidth="60.0"/>
+      <Label text="Чётность:"/>
+      <ComboBox fx:id="parity" prefWidth="90.0"/>
+      <Label text="Стоп:"/>
+      <ComboBox fx:id="stopBits" prefWidth="70.0"/>
+      <Label text="Поток:"/>
+      <ComboBox fx:id="flowControl" prefWidth="90.0"/>
+      <Label text="Адрес Slave:"/>
+      <TextField fx:id="slaveId" prefWidth="50.0" text="1"/>
+      <Region HBox.hgrow="ALWAYS"/>
+      <Button text="Подключить" onAction="#handleOpenConnection"/>
+      <Button text="Отключить" onAction="#handleCloseConnection"/>
+      <Button text="Опросить" onAction="#handleSensorStateRequest"/>
+    </HBox>
+  </top>
+  <center>
+    <SplitPane orientation="VERTICAL" dividerPositions="0.75">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+        <FlowPane fx:id="sensorCardsContainer" hgap="10.0" vgap="10.0" prefWrapLength="800.0">
+          <padding>
+            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+          </padding>
+        </FlowPane>
+      </ScrollPane>
+      <TextArea fx:id="logArea" prefHeight="150.0" minHeight="100.0" wrapText="true"/>
+    </SplitPane>
+  </center>
   <stylesheets>
-    <!--<URL value="@/styles/main.css"></URL>-->
+    <URL value="@/styles/main.css"/>
   </stylesheets>
-</GridPane>
+</BorderPane>

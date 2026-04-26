@@ -1,7 +1,74 @@
 .configPane {
-    -fx-padding: 15;
+    -fx-padding: 10;
     -fx-spacing: 10;
-    -fx-background-color: white;
-    -fx-background-insets: 5;
-    -fx-background-radius: 5.0;
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #ddd;
+    -fx-border-width: 0 0 1 0;
+}
+
+.sensor-card {
+    -fx-padding: 10;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 2;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.sensor-card-shortname {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.sensor-card-type {
+    -fx-font-size: 10px;
+    -fx-text-fill: #666;
+}
+
+.sensor-card-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222;
+}
+
+.sensor-card-name {
+    -fx-font-size: 11px;
+    -fx-text-fill: #333;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.sensor-card-addr {
+    -fx-font-size: 10px;
+    -fx-text-fill: #888;
+}
+
+.state-normal {
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: #4CAF50;
+}
+
+.state-alarm {
+    -fx-background-color: #FFEBEE;
+    -fx-border-color: #F44336;
+}
+
+.state-fault {
+    -fx-background-color: #FFF9C4;
+    -fx-border-color: #FFC107;
+}
+
+.state-disabled {
+    -fx-background-color: #EEEEEE;
+    -fx-border-color: #9E9E9E;
+}
+
+.state-disabled .sensor-card-shortname,
+.state-disabled .sensor-card-value,
+.state-disabled .sensor-card-name,
+.state-disabled .sensor-card-addr,
+.state-disabled .sensor-card-type {
+    -fx-text-fill: #9E9E9E;
 }
