@@ -182,16 +182,41 @@ public class SensorProxy implements Updatable, SensorUpdateListener {
         int valueAddress  = delegate.getModbusAddress() * 2 + 1;
         SensorType type   = delegate.getType();
 
+        ReadInputRegistersRequest statusRequest = new ReadInputRegistersRequest(statusAddress, 1);
+        ReadInputRegistersResponse statusResponse = client.readInputRegisters(slaveId, statusRequest);
+        int statusRaw = ByteBuffer.wrap(statusResponse.registers()).getShort() & 0xFFFF;
+
+        SensorState newState;
+        if ((statusRaw & 0x08) != 0) {
+            newState = SensorState.FAULT;
+        } else if ((statusRaw & 0x04) != 0) {
+            newState = SensorState.ALARM;
+        } else {
+            newState = SensorState.NORMAL;
+        }
+
+        boolean newEnabled = (statusRaw & 0x01) != 0;
+
+        if (newState != delegate.getState()) {
+            delegate.setState(newState);
+            state.set(newState);
+        }
+        if (newEnabled != delegate.isEnabled()) {
+            delegate.setEnabled(newEnabled);
+            enabled.set(newEnabled);
+        }
+
         if (type == SensorType.FIRE_BUTTON || type == SensorType.ALARM_BUTTON) {
-            ReadInputRegistersRequest statusRequest = new ReadInputRegistersRequest(statusAddress, 1);
-            ReadInputRegistersResponse statusResponse = client.readInputRegisters(slaveId, statusRequest);
-            int statusRaw = ByteBuffer.wrap(statusResponse.registers()).getShort() & 0xFFFF;
-            sensorService.setValue(delegate, (statusRaw & 0x04) != 0);
+            boolean pressed = (statusRaw & 0x04) != 0;
+            delegate.setValue(pressed);
+            valueDisplay.set(delegate.getValueDisplay());
         } else {
             ReadInputRegistersRequest request = new ReadInputRegistersRequest(valueAddress, 1);
             ReadInputRegistersResponse response = client.readInputRegisters(slaveId, request);
             int rawValue = ByteBuffer.wrap(response.registers()).getShort() & 0xFFFF;
-            sensorService.setValue(delegate, decodeValue(rawValue, type));
+            Object decodedValue = decodeValue(rawValue, type);
+            delegate.setValue(decodedValue);
+            valueDisplay.set(sensorService.getValueDisplay(delegate));
         }
     }
 

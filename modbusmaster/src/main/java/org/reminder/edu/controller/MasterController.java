@@ -192,6 +192,8 @@ public class MasterController implements Initializable {
         for (Button button : sensorButtons) {
             if (proxies.hasNext()) {
                 proxies.next().setButton(button);
+            } else {
+                button.setVisible(false);
             }
         }
 
