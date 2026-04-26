@@ -10,7 +10,7 @@ import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbuscommon.entity.enums.SensorType;
 import org.reminder.edu.modbuscommon.entity.service.SensorBehaviorService;
 import org.reminder.edu.modbusslave.ModBusSecondary;
-import org.reminder.edu.modbusslave.logging.LogAppenderManager;
+import org.reminder.edu.common.javafx.logging.LogAppenderManager;
 import org.reminder.edu.modbusslave.viewmodel.SensorViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

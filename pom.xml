@@ -15,6 +15,7 @@
     <url>http://maven.apache.org</url>
     <modules>
         <module>modbus-common</module>
+        <module>modbus-common-javafx</module>
         <module>modbusslave</module>
         <module>modbusmaster</module>
     </modules>

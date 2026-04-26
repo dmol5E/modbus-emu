@@ -3,8 +3,6 @@ package org.reminder.edu.controller;
 import com.fazecast.jSerialComm.SerialPort;
 import com.google.inject.Inject;
 import java.net.URL;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +20,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import org.reminder.edu.common.javafx.logging.LogAppenderManager;
 import org.reminder.edu.modbuscommon.entity.enums.SensorState;
 import org.reminder.edu.modbusmaster.entity.SensorProxy;
 import org.reminder.edu.model.MasterModel;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 public class MasterController implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterController.class);
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @FXML
     private TextField slaveId;
@@ -117,6 +115,8 @@ public class MasterController implements Initializable {
             VBox card = createSensorCard(proxy);
             sensorCardsContainer.getChildren().add(card);
         }
+
+        LogAppenderManager.registerTextArea(logArea);
     }
 
     private VBox createSensorCard(SensorProxy proxy) {
@@ -197,7 +197,7 @@ public class MasterController implements Initializable {
         logArea.clear();
 
         if (portNames.getValue() == null) {
-            logArea.appendText("Error: No port selected\n");
+            logger.error("Error: No port selected");
             return;
         }
 
@@ -210,14 +210,12 @@ public class MasterController implements Initializable {
                 stopBits.getValue(),
                 Integer.parseInt(slaveId.getText())
             );
-            logArea.appendText("Connection opened successfully\n");
-            logger.info("Connection opened on port {}", portNames.getValue());
+            logger.info("Connection opened successfully on port {}", portNames.getValue());
 
             lastStates.clear();
             lastValues.clear();
         } catch (Exception e) {
-            logArea.appendText("Error opening connection: " + e.getMessage() + "\n");
-            logger.error("Error opening connection", e);
+            logger.error("Error opening connection: {}", e.getMessage());
         }
     }
 
@@ -225,11 +223,9 @@ public class MasterController implements Initializable {
     private void handleCloseConnection() {
         try {
             model.closeConnection();
-            logArea.appendText("Connection closed\n");
             logger.info("Connection closed");
         } catch (Exception e) {
-            logArea.appendText("Error closing connection: " + e.getMessage() + "\n");
-            logger.error("Error closing connection", e);
+            logger.error("Error closing connection: {}", e.getMessage());
         }
     }
 
@@ -242,12 +238,13 @@ public class MasterController implements Initializable {
         } catch (Exception e) {
             logger.error("Error closing connection on exit", e);
         }
+        LogAppenderManager.unregisterTextArea();
     }
 
     @FXML
     private void handleSensorStateRequest() {
         if (!model.isOpenConnection()) {
-            logArea.appendText("Error: Not connected\n");
+            logger.error("Error: Not connected");
             return;
         }
 
@@ -262,7 +259,7 @@ public class MasterController implements Initializable {
                 String newValue = sensor.getValueDisplay();
 
                 if (prevState != null && prevState != newState) {
-                    logEvent(
+                    logger.info(
                         sensor.getName() +
                             ": " +
                             stateDisplay(prevState) +
@@ -273,7 +270,7 @@ public class MasterController implements Initializable {
                             ")"
                     );
                 } else if (prevValue != null && !prevValue.equals(newValue) && prevState == newState) {
-                    logEvent(sensor.getName() + ": значение изменено " + prevValue + " → " + newValue);
+                    logger.info(sensor.getName() + ": значение изменено " + prevValue + " → " + newValue);
                 }
 
                 lastStates.put(sensor, newState);
@@ -283,7 +280,7 @@ public class MasterController implements Initializable {
                 logger.error("Error updating sensor {}: {}", sensor.getName(), e.getMessage());
             }
         }
-        logArea.appendText("Sensor states updated: " + updated + "/" + sensors.size() + "\n");
+        logger.info("Sensor states updated: {}/{}", updated, sensors.size());
     }
 
     private String stateDisplay(SensorState state) {
@@ -292,10 +289,5 @@ public class MasterController implements Initializable {
             case ALARM -> "ТРЕВОГА";
             case FAULT -> "НЕИСПРАВНОСТЬ";
         };
-    }
-
-    private void logEvent(String message) {
-        String timestamp = LocalTime.now().format(TIME_FORMATTER);
-        logArea.appendText("[" + timestamp + "] " + message + "\n");
     }
 }

@@ -19,6 +19,11 @@
             <artifactId>modbus-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.remind.edu</groupId>
+            <artifactId>modbus-common-javafx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.google.inject</groupId>

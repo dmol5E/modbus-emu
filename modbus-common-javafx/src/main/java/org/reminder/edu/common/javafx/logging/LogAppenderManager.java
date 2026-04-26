@@ -1,4 +1,4 @@
-package org.reminder.edu.modbusslave.logging;
+package org.reminder.edu.common.javafx.logging;
 
 import javafx.scene.control.TextArea;
 import org.apache.logging.log4j.LogManager;

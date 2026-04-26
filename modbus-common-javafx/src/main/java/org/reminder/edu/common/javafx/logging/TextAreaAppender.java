@@ -1,4 +1,4 @@
-package org.reminder.edu.modbusslave.logging;
+package org.reminder.edu.common.javafx.logging;
 
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.LogEvent;
@@ -14,14 +14,14 @@ public class TextAreaAppender extends AbstractAppender {
     private volatile TextArea textArea;
 
     public TextAreaAppender(String name, Filter filter, TextArea textArea) {
-        super(name, filter, PatternLayout.createDefaultLayout(), false, Property.EMPTY_ARRAY);
+        super(name, filter, PatternLayout.newBuilder().withPattern("%d{HH:mm:ss} %m%n").build(), false, Property.EMPTY_ARRAY);
         this.textArea = textArea;
     }
 
     @Override
     public void append(LogEvent event) {
         String logMessage = new String(getLayout().toByteArray(event));
-        
+
         // Update the TextArea on the JavaFX Application Thread
         TextArea currentTextArea = this.textArea;
         if (currentTextArea != null) {
